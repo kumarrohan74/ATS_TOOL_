@@ -47,8 +47,6 @@ function Candidatelist() {
     const data = React.useContext(CandidateContext);
 
     const candidates = data.candidates;
-    let pagesRequired;
-    pagesRequired = candidates ? Math.round(candidates.length / 10) : 0
     let rows;
     if (candidates) {
 
