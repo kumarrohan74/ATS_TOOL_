@@ -6,7 +6,7 @@ let dbConnection;
 
 async function connectDB() {
     try {
-        const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
+        const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true, ssl: true });
         await client.connect();
         console.log("MongoDB Connected");
         dbConnection = client.db('ATS_master_data');
