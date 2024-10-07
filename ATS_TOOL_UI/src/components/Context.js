@@ -10,11 +10,9 @@ export const DataProvider = ({ children }) => {
             .then(res => res.json())
             .then(response => {
                 setData(response);
-                // console.log(response)
             })
             .catch(err => console.error(err))
     }, []);
-    //console.log(data)
     return (
         <CandidateContext.Provider value={data}>
             {children}

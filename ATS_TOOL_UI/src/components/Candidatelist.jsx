@@ -47,20 +47,19 @@ function Candidatelist() {
     const data = React.useContext(CandidateContext);
 
     const candidates = data.candidates;
-    console.log(candidates);
     let pagesRequired;
     pagesRequired = candidates ? Math.round(candidates.length / 10) : 0
-    console.log(pagesRequired);
     let rows;
     if (candidates) {
 
         rows = candidates.map((details) => {
             return { id: details.id, name: details.name, email: details.email, score: details.ats_score, position: details.position }
         })
-        console.log(rows)
     }
     return (
-        <DataTable columns={columns} rows={rows} />
+        <div className='m-8 w-full'>
+            <DataTable columns={columns} rows={rows} />
+        </div>
     );
 }
 
