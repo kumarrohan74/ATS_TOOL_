@@ -1,6 +1,6 @@
 const { MongoClient } = require('mongodb');
 
-const uri = "mongodb+srv://ATS_TOOL_ADMIN:password_ats@cluster0.4ao1e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0";
+const uri = `mongodb+srv://${process.env.DATABASE_USER}:${process.env.DATABASE_PASSWORD}@cluster0.4ao1e.mongodb.net/?retryWrites=true&w=majority&appName=Cluster0`;
 
 let dbConnection;
 
