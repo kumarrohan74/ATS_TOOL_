@@ -11,37 +11,38 @@ const columns = [
         width: 160,
         editable: true,
     },
-
     {
         field: 'email',
-        headerName: 'email',
+        headerName: 'Email',
         sortable: false,
         width: 160,
     },
     {
-        field: 'position',
-        headerName: 'Position',
-        width: 150
-    }, {
-        field: 'score',
-        headerName: 'ATS_Score',
+        field: 'applied_position',
+        headerName: 'Applied Position',
+        width: 150,
+    },
+    {
+        field: 'ats_score',
+        headerName: 'ATS Score',
+    },
+    {
+        field: 'location',
+        headerName: 'Location',
+        width: 140,
+    },
+    {
+        field: 'status',
+        headerName: 'Application Status',
+        width: 160,
+    },
+    {
+        field: 'experience',
+        headerName: 'Experience',
         type: 'number',
-        width: 110,
-        editable: true,
+        width: 120,
     },
 ];
-
-/*const rows = [
-  { id: 1, lastName: 'Snow', firstName: 'Jon', age: 14 },
-  { id: 2, lastName: 'Lannister', firstName: 'Cersei', age: 31 },
-  { id: 3, lastName: 'Lannister', firstName: 'Jaime', age: 31 },
-  { id: 4, lastName: 'Stark', firstName: 'Arya', age: 11 },
-  { id: 5, lastName: 'Targaryen', firstName: 'Daenerys', age: null },
-  { id: 6, lastName: 'Melisandre', firstName: null, age: 150 },
-  { id: 7, lastName: 'Clifford', firstName: 'Ferrara', age: 44 },
-  { id: 8, lastName: 'Frances', firstName: 'Rossini', age: 36 },
-  { id: 9, lastName: 'Roxie', firstName: 'Harvey', age: 65 },
-];*/
 
 function Candidatelist() {
     const data = React.useContext(CandidateContext);
@@ -51,7 +52,11 @@ function Candidatelist() {
     if (candidates) {
 
         rows = candidates.map((details) => {
-            return { id: details.id, name: details.name, email: details.email, score: details.ats_score, position: details.position }
+            console.log(details)
+            return {
+                id: details.id, name: details.name, email: details.email, ats_score: details.ats_score, applied_position: details.applied_position,
+                location: details.location, status: details.status, experience: details.experience
+            }
         })
     }
     return (
