@@ -11,27 +11,38 @@ const columns = [
         width: 160,
         editable: true,
     },
-
     {
         field: 'email',
-        headerName: 'email',
+        headerName: 'Email',
         sortable: false,
         width: 160,
     },
     {
-        field: 'position',
-        headerName: 'Position',
-        width: 150
-    }, {
-        field: 'score',
-        headerName: 'ATS_Score',
+        field: 'applied_position',
+        headerName: 'Applied Position',
+        width: 150,
+    },
+    {
+        field: 'ats_score',
+        headerName: 'ATS Score',
+    },
+    {
+        field: 'location',
+        headerName: 'Location',
+        width: 140,
+    },
+    {
+        field: 'status',
+        headerName: 'Application Status',
+        width: 160,
+    },
+    {
+        field: 'experience',
+        headerName: 'Experience',
         type: 'number',
-        width: 110,
-        editable: true,
+        width: 120,
     },
 ];
-
-
 
 function Candidatelist() {
     const { data } = React.useContext(CandidateContext);
@@ -39,9 +50,12 @@ function Candidatelist() {
     const candidates = data.candidates;
     let rows;
     if (candidates) {
-
-        rows = candidates.map((details, i) => {
-            return { id: i + 1, name: details.name, email: details.email, score: details.ats_score, position: details.position }
+        rows = candidates.map((details) => {
+            console.log(details)
+            return {
+                id: details.id, name: details.name, email: details.email, ats_score: details.ats_score, applied_position: details.applied_position,
+                location: details.location, status: details.status, experience: details.experience
+            }
         })
     }
     return (

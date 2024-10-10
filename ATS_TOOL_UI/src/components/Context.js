@@ -6,8 +6,10 @@ export const DataProvider = ({ children }) => {
     const [data, setData] = useState('');
     const apiURI = process.env.REACT_APP_API_URL;
     const [loader, setLoader] = useState(true)
+    const endpoint = "/get-candidates"
+
     useEffect(() => {
-        fetch(`${apiURI}/get-candidates`)
+        fetch(`${apiURI}${endpoint}`)
             .then(res => res.json())
             .then(response => {
                 setData(response);
