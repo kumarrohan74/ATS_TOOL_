@@ -45,12 +45,11 @@ const columns = [
 ];
 
 function Candidatelist() {
-    const data = React.useContext(CandidateContext);
+    const { data } = React.useContext(CandidateContext);
 
     const candidates = data.candidates;
     let rows;
     if (candidates) {
-
         rows = candidates.map((details) => {
             console.log(details)
             return {
