@@ -2,11 +2,33 @@ import * as React from 'react';
 import Box from '@mui/material/Box';
 import { DataGrid } from '@mui/x-data-grid';
 import { CandidateContext } from './Context';
+import { useNavigate } from 'react-router-dom';
 function DataTable(props) {
     const { loader } = React.useContext(CandidateContext);
     const rows = props.rows;
+   const [profile,setProfile] = React.useState(null);
     const columns = props.columns;
+    const navigate= useNavigate();
+    
+   async function handleSingleProfile(e){
+    const apiURI = process.env.REACT_APP_API_URL
+    console.log(e.id)
+       fetch(`${apiURI}/candidate/${e.id}`)
+       .then((res)=>{
+        console.log(res);
+        if (!res.ok) {
+            throw new Error(`HTTP error! status: ${res.status}`);
+          }
 
+          return res.json();
+        })
+       .then((data)=> setProfile(data))
+       .catch((err)=> console.error(err))
+       console.log(profile, ' profile');
+      // navigate(`/candidate/${e.id}`,{state: profile});
+     
+      
+    }
     return (
         <Box sx={{ minHeight: '20%', height: 'auto', width: '100%' }}>
             <DataGrid style={{ paddingLeft: '.1%', minHeight: '350px' }}
@@ -23,6 +45,7 @@ function DataTable(props) {
                 // checkboxSelection
                 disableRowSelectionOnClick
                 loading={loader}
+                onRowClick={handleSingleProfile}
             />
         </Box>
     );
