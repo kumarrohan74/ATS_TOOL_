@@ -15,8 +15,6 @@ const style = {
     borderRadius: '.5%',
     boxShadow: 28,
     p: 4,
-
-
 };
 
 export default function UploadModal(props) {

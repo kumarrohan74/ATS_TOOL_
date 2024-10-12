@@ -2,3 +2,4 @@ ATS_TOOL_UI/node_modules/
 ATS_TOOL_API/node_modules/
 ATS_TOOL_API/.env
 ATS_TOOL_UI/.env
+.DS_Store

@@ -8,7 +8,6 @@ const Sidebar = () => {
   const navigate = useNavigate();
   const [activePath, setActivePath] = useState(location.pathname)
   const handleClick = (e) => {
-    console.log(e.target.id)
     if(e.target.id==='candidatelist'){
       navigate('/candidatelist')
       setActivePath('/candidatelist')

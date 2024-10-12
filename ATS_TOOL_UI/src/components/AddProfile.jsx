@@ -13,8 +13,6 @@ function AddProfile() {
     }
 
     setIsOpen(true)
-    console.log(text)
-    console.log(file)
 
   }
   const closeModal = () => setIsOpen(false)
