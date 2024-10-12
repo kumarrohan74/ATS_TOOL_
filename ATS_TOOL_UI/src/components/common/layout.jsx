@@ -3,13 +3,13 @@ import Sidebar from "./sidebar";
 import Header from "./header";
 import { BrowserRouter } from "react-router-dom";
 import { DataProvider } from "../Context";
-const Layout = ({ children }) => {
+const Layout = ({ userData, children }) => {
 
     return (
         <div>
             <DataProvider>
                 <div>
-                    <Header />
+                    <Header userInfo={userData}/>
                 </div>
                 <div className="flex">
                     <BrowserRouter>

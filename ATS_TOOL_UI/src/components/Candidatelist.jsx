@@ -46,12 +46,10 @@ const columns = [
 
 function Candidatelist() {
     const { data } = React.useContext(CandidateContext);
-
     const candidates = data.candidates;
     let rows;
     if (candidates) {
         rows = candidates.map((details) => {
-            console.log(details)
             return {
                 id: details.id, name: details.name, email: details.email, ats_score: details.ats_score, applied_position: details.applied_position,
                 location: details.location, status: details.status, experience: details.experience
