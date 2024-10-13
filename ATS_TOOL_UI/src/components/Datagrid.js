@@ -25,7 +25,7 @@ function DataTable(props) {
        .then((data)=> setProfile(data))
        .catch((err)=> console.error(err))
        console.log(profile, ' profile');
-      // navigate(`/candidate/${e.id}`,{state: profile});
+       navigate(`/candidate/${e.id}`,{state: profile});
      
       
     }
