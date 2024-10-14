@@ -6,7 +6,6 @@ import { useNavigate } from 'react-router-dom';
 function DataTable(props) {
     const { loader } = React.useContext(CandidateContext);
     const rows = props.rows;
-   const [profile,setProfile] = React.useState(null);
     const columns = props.columns;
     const navigate= useNavigate();
     
@@ -22,12 +21,10 @@ function DataTable(props) {
 
           return res.json();
         })
-       .then((data)=> setProfile(data))
+       .then((data)=> {
+        navigate(`/candidate/${e.id}`,{state: data});
+       })
        .catch((err)=> console.error(err))
-       console.log(profile, ' profile');
-       navigate(`/candidate/${e.id}`,{state: profile});
-     
-      
     }
     return (
         <Box sx={{ minHeight: '20%', height: 'auto', width: '100%' }}>
