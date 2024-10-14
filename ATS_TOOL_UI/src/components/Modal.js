@@ -18,7 +18,7 @@ const style = {
 };
 
 export default function UploadModal(props) {
-    const { isOpen, closeModal } = props.value
+    const { isOpen, closeModal, score } = props.value
     return (
         <div>
 
@@ -33,7 +33,7 @@ export default function UploadModal(props) {
                         Successfully analysed and uploaded
                     </Typography>
                     <Typography id="modal-modal-description" className="text-center" sx={{ mt: 2, text: 'bold' }} variant="h3" component="h1">
-                        <p>Performance Score : 75%</p>
+                        <p>ATS Score : {score}%</p>
                     </Typography>
                     <Box display="flex" justifyContent="space-between" gap={4} mt={6}>
                         <Button variant="contained">Check Profile</Button>
