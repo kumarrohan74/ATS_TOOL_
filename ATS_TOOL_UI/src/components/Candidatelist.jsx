@@ -9,7 +9,6 @@ const columns = [
         field: 'name',
         headerName: 'Full Name',
         width: 160,
-        editable: true,
     },
     {
         field: 'email',
@@ -49,17 +48,16 @@ function Candidatelist() {
     const candidates = data.candidates;
     let rows;
     if (candidates) {
-        rows = candidates.map((details) => {
-            return {
-                id: details.id, name: details.name, email: details.email, ats_score: details.ats_score, applied_position: details.applied_position,
+        rows = candidates.map((details) =>{
+             return { id: details._id, name: details.name, email: details.email, ats_score: details.ats_score, applied_position: details.applied_position,
                 location: details.location, status: details.status, experience: details.experience
-            }
-        })
+        }
+     } )
     }
     return (
-        <div className='m-8 w-full'>
+    <div className='m-8 w-full'>
             <DataTable columns={columns} rows={rows} />
-        </div>
+       </div>
     );
 }
 
