@@ -9,8 +9,6 @@ require('dotenv').config();
 const { connectDB, getDB } = require('./db');
 const { compareText } = require("./utils/textMatch");
 const { ObjectId } = require("mongodb")
-require('dotenv').config();
-const { connectDB, getDB } = require('./db');
 
 //express
 const app = express();

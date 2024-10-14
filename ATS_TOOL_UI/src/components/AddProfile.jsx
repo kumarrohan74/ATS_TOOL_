@@ -13,7 +13,7 @@ function AddProfile() {
   const apiURI = process.env.REACT_APP_API_URL;
   const endpoint = '/resume-upload';
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!resume || !jobDescription) {
       alert('Please upload pdf file');
