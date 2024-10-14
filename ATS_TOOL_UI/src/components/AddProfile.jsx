@@ -4,20 +4,18 @@ function AddProfile() {
   const [file, setFile] = useState(null);
   const [text, setText] = useState('');
   const [isOpen, setIsOpen] = useState(false)
-
+  {/* Upload file and JD */ }
   const handleSubmit = (e) => {
     e.preventDefault();
     if (!file || !text) {
       alert('Please upload pdf file');
       return;
     }
-
     setIsOpen(true)
-
   }
   const closeModal = () => setIsOpen(false)
   return (<>
-    { isOpen && <UploadModal value={{ isOpen, closeModal }} /> }
+    {isOpen && <UploadModal value={{ isOpen, closeModal }} />}
     <form onSubmit={handleSubmit} className="h-screen w-screen flex justify-between items-center space-y-6 bg-slate-100">
       <div className="w-full h-screen mt-4">
         {/* Job Description */}
@@ -43,7 +41,6 @@ function AddProfile() {
           onChange={(e) => setFile(e.target.files[0])}
           className="hidden"
         />
-
         {/* Custom file input box */}
         <label
           htmlFor="fileUpload"
