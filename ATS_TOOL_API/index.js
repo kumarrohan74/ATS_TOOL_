@@ -139,8 +139,6 @@ app.post("/resume-upload", upload.single("resume"), async (req, res) => {
   }
 });
 
-async function fetchCandidates() {
-
   app.get('/candidate/:id', async (req, res) => {
     const candidate = await fetchCandidates(req.params.id);
     res.json(candidate)
@@ -164,7 +162,7 @@ async function fetchCandidates() {
       throw error;
     }
   }
-}
+
 
   const PORT = process.env.PORT || 5001;
   app.listen(PORT, () => {
