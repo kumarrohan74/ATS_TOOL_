@@ -44,7 +44,7 @@ function DataTable(props) {
   }
   return (
     <>
-      <Box sx={{ width: '100%' }}>
+      <Box className="w-full mb-4">
         <TextField
           variant="outlined"
           label="Search"
