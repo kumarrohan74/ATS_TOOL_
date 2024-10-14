@@ -13,22 +13,7 @@ function AddProfile() {
   const apiURI = process.env.REACT_APP_API_URL;
   const endpoint = '/resume-upload';
 
-  // const handleSubmit = (e) => {
-  //   e.preventDefault();
-  //   if (!resume || !jobDescription) {
-  //     alert('Please upload pdf file');
-  //     return;
-  //   }
-  //   const formData = new FormData();
-  //   formData.append("resume", resume);
-  //   formData.append("jobDescription", jobDescription);
-  //   setIsOpen(true)
-  //   console.log(jobDescription)
-  //   console.log(resume)
-
-  // }
-
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault();
     if (!resume || !jobDescription) {
       alert('Please upload pdf file');
@@ -50,13 +35,10 @@ function AddProfile() {
     }
   };
 
-
-  console.log(score)
-
   const closeModal = () => setIsOpen(false)
-  return (<>
+  return (
+  <>
     { isOpen && <UploadModal value={{ isOpen, closeModal, score }} /> }
-    {/* <form onSubmit={handleSubmit} className="h-screen w-screen flex justify-between items-center space-y-6 bg-slate-100"> */}
       <div className="w-full h-screen mt-4">
         {/* Job Description */}
         <label
@@ -81,7 +63,6 @@ function AddProfile() {
           onChange={(e) => setResume(e.target.files[0])}
           className="hidden"
         />
-
         {/* Custom file input box */}
         <label
           htmlFor="fileUpload"
@@ -96,7 +77,6 @@ function AddProfile() {
           Upload
         </button>
       </div>
-    {/* </form> */}
   </>)
 }
 export default AddProfile;
