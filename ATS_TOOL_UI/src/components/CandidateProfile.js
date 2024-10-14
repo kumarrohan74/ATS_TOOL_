@@ -34,7 +34,7 @@ export default function CandidateProfile() {
           </div>
         </div>
       </div>
-      <div className="flex flex-wrap mx-4">
+      <div className="flex flex-wrap">
         <div className="w-1/3 px-2">
           <div className="bg-white rounded-lg shadow-lg p-6 mb-4">
             <h3 className="text-2xl font-bold text-center text-indigo-800 mb-4">Skills</h3>
