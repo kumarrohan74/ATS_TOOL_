@@ -9,7 +9,7 @@ require('dotenv').config();
 const { connectDB, getDB } = require('./db');
 const { compareText } = require("./utils/textMatch");
 const { ObjectId } = require("mongodb")
-
+let objID;
 //express
 const app = express();
 app.use(cors());
@@ -79,7 +79,7 @@ const extractName = (text) => {
     let name = nameMatch[1].trim();
     if (!isCommonWord(name)) {
       return name;
-    }
+    } 
   }
 
   // Split the resume text into lines and iterate through them
@@ -131,18 +131,28 @@ app.post("/resume-upload", upload.single("resume"), async (req, res) => {
     const resumeText = resumeData.text;
     const name = extractName(resumeText);   // You'll need logic for this
     const email = extractEmail(resumeText);
-    const phone = extractPhone(resumeText);
-    const atsScore = compareText(resumeText, jobDescription);
-    res.json({ atsScore: Number(atsScore), name, phone, email });
+    const phone_number = extractPhone(resumeText);
+    const ats_score = compareText(resumeText, jobDescription);
+   
+    const ats_db = await connectDB();
+    const collection= await ats_db.collection(candidates_db);
+    const result = await collection.insertOne({name,email,phone_number,ats_score});
+    objID= result.insertedId.toString();
+    res.status(201).json({atsScore: Number(ats_score), message:'Data added',id:objID})
   } catch (error) {
     res.status(500).send("Error parsing resume");
   }
+});
+app.get('/resume-upload',(req,res)=>{
+  res.json({id:objID})
 });
 
   app.get('/candidate/:id', async (req, res) => {
     const candidate = await fetchCandidates(req.params.id);
     res.json(candidate)
-  })
+  });
+
+  
   async function fetchCandidates(value) {
 
     try {

@@ -2,9 +2,9 @@ const natural = require("natural");
 
 // Simple keyword matching function
 const compareText = (resumeText, jobDescription) => {
-    console.log("rohuuuuuu")
-console.log(resumeText)
-console.log("jobDescription",jobDescription)
+    //console.log("rohuuuuuu")
+//console.log(resumeText)
+//console.log("jobDescription",jobDescription)
   const tokenizer = new natural.WordTokenizer();
   const resumeTokens = tokenizer.tokenize(resumeText);
   const jobDescriptionTokens = tokenizer.tokenize(jobDescription);

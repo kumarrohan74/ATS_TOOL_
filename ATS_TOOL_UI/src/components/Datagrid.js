@@ -9,8 +9,8 @@ function DataTable(props) {
   const { loader } = React.useContext(CandidateContext);
   const rows = props.rows;
   const columns = props.columns;
-  const navigate = useNavigate();
   const [search, setSearch] = useState('');
+  const navigate = useNavigate();
   {/* Handle search change */ }
   const handleSearch = (e) => {
     const value = e.target.value.toLowerCase();
@@ -24,8 +24,7 @@ function DataTable(props) {
       return value.includes(search);
     })
   );
-
-  async function handleSingleProfile(e) {
+  const handleSingleProfile = async (e)=> {
     const apiURI = process.env.REACT_APP_API_URL
     console.log(e.id)
     fetch(`${apiURI}/candidate/${e.id}`)
@@ -38,10 +37,11 @@ function DataTable(props) {
         return res.json();
       })
       .then((data) => {
-        navigate(`/candidate/${e.id}`, { state: data });
+        navigate(`/candidate/${e.id}`, { state: {candidate: data} });
       })
       .catch((err) => console.error(err))
   }
+ 
   return (
     <>
       <Box className="w-full mb-4">
