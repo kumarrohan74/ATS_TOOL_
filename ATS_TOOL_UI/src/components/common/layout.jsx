@@ -7,7 +7,7 @@ const Layout = ({ userData, children }) => {
 
     return (
         <div>
-            <DataProvider>
+                  <DataProvider>
                 <div>
                     <Header userInfo={userData}/>
                 </div>
@@ -17,7 +17,8 @@ const Layout = ({ userData, children }) => {
                         {children}
                     </BrowserRouter>
                 </div>
-            </DataProvider>
+                </DataProvider>
+            
         </div>
     )
 }

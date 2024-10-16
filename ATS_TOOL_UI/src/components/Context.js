@@ -1,6 +1,5 @@
 import { useState, useEffect, createContext } from "react";
 
-
 export const CandidateContext = createContext();
 export const DataProvider = ({ children }) => {
     const [data, setData] = useState('');

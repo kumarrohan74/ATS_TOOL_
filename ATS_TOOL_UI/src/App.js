@@ -5,6 +5,7 @@ import { useGoogleLogin } from '@react-oauth/google';
 import { useState, useEffect } from 'react';
 import Login from './components/Login';
 
+
 function App() {
 
   const [isAuthenticated, setIsAuthenticated] = useState(false);
@@ -59,7 +60,7 @@ function App() {
 
     <div>
       {isLoggedIn ? (<Layout userData={userInfo}>
-        <Router />
+       <Router />
       </Layout>) : (
         <Login handleLoginSuccess={handleGoogleSignIn} />
       )}

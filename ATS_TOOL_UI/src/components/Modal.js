@@ -3,7 +3,7 @@ import Box from '@mui/material/Box';
 import Button from '@mui/material/Button';
 import Typography from '@mui/material/Typography';
 import Modal from '@mui/material/Modal';
-
+import { useNavigate } from 'react-router-dom';
 const style = {
     position: 'absolute',
     top: '40%',
@@ -16,9 +16,32 @@ const style = {
     boxShadow: 28,
     p: 4,
 };
+const url = process.env.REACT_APP_API_URL;
 
 export default function UploadModal(props) {
-    const { isOpen, closeModal, score } = props.value
+    const { isOpen, closeModal, score } = props.value;
+    const [profileID,setProfileID] = React.useState()
+    const navigate = useNavigate();
+    const [isLoading,setIsLoading] = React.useState(false)
+    const HandleBackToProfile = async ()=>{
+        try {
+           setIsLoading(true);
+           const fetchData= await fetch(`${url}/resume-upload`)
+           const objID = await fetchData.json();
+           const {id} = await objID;
+           const fetchProfile = await fetch(`${url}/candidate/${id}`)
+           const response = await fetchProfile.json();
+           console.log(response, ' Modal')
+           if(response){
+            setIsLoading(false)
+          }
+           navigate(`/candidate/${id}`,{state:{candidate: response}})
+           
+    }
+        catch(e){
+            console.error('failed to swtich back to added profile', e)
+        }
+    }
     return (
         <div>
 
@@ -36,7 +59,7 @@ export default function UploadModal(props) {
                         <p>ATS Score : {score}%</p>
                     </Typography>
                     <Box display="flex" justifyContent="space-between" gap={4} mt={6}>
-                        <Button variant="contained">Check Profile</Button>
+                        <Button variant="contained" onClick={HandleBackToProfile}>Check Profile</Button>
                         <Button variant="outlined" onClick={closeModal}>Back to Add Profile</Button>
                     </Box>
                 </Box>
