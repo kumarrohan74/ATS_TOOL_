@@ -19,32 +19,28 @@ const style = {
 const url = process.env.REACT_APP_API_URL;
 
 export default function UploadModal(props) {
-    const { isOpen, closeModal, score } = props.value;
-    const [profileID,setProfileID] = React.useState()
+
+    const { isOpen, closeModal, score, candidateId } = props.value;
     const navigate = useNavigate();
-    const [isLoading,setIsLoading] = React.useState(false)
-    const HandleBackToProfile = async ()=>{
+    const [isLoading, setIsLoading] = React.useState(false)
+
+    const HandleBackToProfile = async () => {
         try {
-           setIsLoading(true);
-           const fetchData= await fetch(`${url}/resume-upload`)
-           const objID = await fetchData.json();
-           const {id} = await objID;
-           const fetchProfile = await fetch(`${url}/candidate/${id}`)
-           const response = await fetchProfile.json();
-           console.log(response, ' Modal')
-           if(response){
-            setIsLoading(false)
-          }
-           navigate(`/candidate/${id}`,{state:{candidate: response}})
-           
-    }
-        catch(e){
+            setIsLoading(true);
+            const fetchProfile = await fetch(`${url}/candidate/${candidateId}`)
+            const response = await fetchProfile.json();
+            if (response) {
+                setIsLoading(false)
+            }
+            navigate(`/candidate/${candidateId}`, { state: { candidate: response } })
+
+        }
+        catch (e) {
             console.error('failed to swtich back to added profile', e)
         }
     }
     return (
         <div>
-
             <Modal
                 open={isOpen}
                 onClose={closeModal}

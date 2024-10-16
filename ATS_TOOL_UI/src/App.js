@@ -79,13 +79,10 @@ function App() {
     checkAuth();
   }, []);
 
-
-
   return (
-
     <div>
       {isLoggedIn ? (<Layout userData={userInfo}>
-       <Router />
+        <Router />
       </Layout>) : (
         <Login handleLoginSuccess={handleGoogleSignIn} />
       )}

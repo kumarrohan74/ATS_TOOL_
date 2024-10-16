@@ -17,7 +17,6 @@ async function connectDB() {
     }
 }
 
-// Function to get the connected database instance
 function getDB() {
     if (!dbConnection) {
         throw new Error('Database not initialized');

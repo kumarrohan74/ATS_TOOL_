@@ -1,6 +1,6 @@
 
 import * as React from 'react';
-import { CandidateContext } from './Context';
+import { useEffect, useState } from 'react';
 import DataTable from './Datagrid';
 
 const columns = [
@@ -43,23 +43,41 @@ const columns = [
     },
 ];
 
+
+
 function Candidatelist() {
-    const { data } = React.useContext(CandidateContext);
+  
+    const apiURI = process.env.REACT_APP_API_URL;
+    const [loader, setLoader] = useState(true);
+    const [data, setData] = useState([])
+
+    const endpoint = "/get-candidates"
+
+    useEffect(() => {
+        fetch(`${apiURI}${endpoint}`)
+            .then(res => res.json())
+            .then(response => {
+                setData(response);
+                setLoader(false);
+            })
+            .catch(err => console.error(err))
+    }, []);
+
     const candidates = data.candidates;
     let rows;
     if (candidates) {
-        rows = candidates.map((details) =>{
-             return { id: details?._id, name: details?.name, email: details?.email, ats_score: details?.ats_score, applied_position: details?.applied_position,
-                location: details?.location, status: details?.status, experience: details?.experience
-        }
-     } )
+        rows = candidates.map((details) => {
+            return {
+                id: details?._id, name: details?.name, email: details?.email, ats_score: details?.ats_score, applied_position: details?.applied_position,
+                location: details?.location, status: details?.status, experience: details?.experience?.totalYears
+            }
+        })
     }
     return (
-    <div className='m-8 w-full'>
+        <div className='m-8 w-full'>
             <DataTable columns={columns} rows={rows} />
-       </div>
+        </div>
     );
 }
-
 
 export default Candidatelist;

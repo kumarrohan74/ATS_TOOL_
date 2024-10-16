@@ -5,15 +5,13 @@ import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import CircularLoader from '../utils/Loader';
+
 export default function CandidateProfile() {
 
   const location = useLocation();
   const list = location.state?.candidate;
-  console.log(list, ' Location')
   const skills = list?.skills || [];
- 
- 
-  
+
   return (<>
     <div className="bg-slate-50 w-screen min-h-screen p-6">
       <div class="flex flex-wrap w-full">
@@ -28,7 +26,7 @@ export default function CandidateProfile() {
             <p class="text-gray-500 text-base">{list?.education}</p>
           </div>
           <div className="ml-14">
-            <ATSScoreCard score={list?.atsScore} />
+            <ATSScoreCard score={list?.ats_score} />
           </div>
           <div className="ml-auto">
             <p className="text-gray-600 text-lg"><strong><MailIcon /></strong> {list?.email}</p>
