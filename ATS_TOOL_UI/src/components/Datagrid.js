@@ -47,14 +47,14 @@ function DataTable(props) {
             <Box className="w-full mb-4">
                 <TextField
                     variant="outlined"
-                    label="Search"
+                    label="Search candidates details"
                     fullWidth
                     value={search}
                     onChange={handleSearch}
                 />
             </Box>
             <Box sx={{ minHeight: '20%', height: 'auto', width: '100%' }}>
-                <DataGrid style={{ paddingLeft: '.1%', minHeight: '350px' }}
+                <DataGrid style={{ paddingLeft: '.1%', minHeight: '300px' }}
                     rows={filteredRows}
                     columns={columns}
                     initialState={{

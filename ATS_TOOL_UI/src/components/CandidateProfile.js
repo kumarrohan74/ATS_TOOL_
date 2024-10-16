@@ -1,3 +1,4 @@
+import { useState } from 'react';
 import { useLocation } from "react-router-dom";
 import ATSScoreCard from "./ATSScoreCard";
 import MailIcon from '@mui/icons-material/Mail';
@@ -11,6 +12,8 @@ export default function CandidateProfile() {
   const location = useLocation();
   const list = location.state?.candidate;
   const skills = list?.skills || [];
+
+  const [resume, setResume] = useState(list?.resume);
 
   return (<>
     <div className="bg-slate-50 w-screen min-h-screen p-6">
@@ -32,7 +35,9 @@ export default function CandidateProfile() {
             <p className="text-gray-600 text-lg"><strong><MailIcon /></strong> {list?.email}</p>
             <p className="text-gray-600 text-lg"><strong><LocalPhoneIcon /></strong> {list?.phone_number}</p>
             <p className="text-gray-600 text-lg"><strong><LocationOnIcon /></strong> {list?.location}</p>
-            <p className="text-gray-600 text-lg"><strong><PictureAsPdfIcon /><a href={list?.resume_url} target="_blank" rel="noopener noreferrer" className="text-indigo-600 underline ml-1">View Resume</a></strong> </p>
+            <p className="text-gray-600 text-lg"><strong><PictureAsPdfIcon /><a className="text-blue-600 text-underline" href={`data:application/pdf;base64,${resume.resumeBuffer}`} download={resume.resumeName}>
+                            {resume.resumeName}
+                        </a></strong> </p>
           </div>
         </div>
       </div>

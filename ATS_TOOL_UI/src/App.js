@@ -65,7 +65,6 @@ function App() {
     if (tokenExpiryTime) {
       const currentTime = new Date().getTime();
       const timeLeft = tokenExpiryTime - currentTime;
-      console.log(timeLeft)
       const timeout = setTimeout(() => {
         handleLogout();
       }, timeLeft);

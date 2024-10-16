@@ -1,5 +1,7 @@
 import { useState } from "react";
 import axios from "axios";
+import Button from '@mui/material/Button';
+import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import UploadModal from "./Modal";
 
 
@@ -43,40 +45,57 @@ function AddProfile() {
   return (
     <>
       {isOpen && <UploadModal value={{ isOpen, closeModal, score, candidateId }} />}
+      <form onSubmit={handleSubmit} className="w-full">
       <div className="w-full h-screen mt-4">
-        <label
-          className="block ml-11 pl-1 mb-1 text-lg font-bold text-gray-700"
-          htmlFor="file_input"
-        >
-          Job Description:
-        </label>
-        <textarea
-          id="textarea"
-          value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
-          className="border border-gray-300 ml-11  rounded-lg p-2 w-11/12 h-96 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 placeholder-gray-500 bg-zinc-50"
-          placeholder="Write job description here"
-        />
-        <input
-          id="fileUpload"
-          type="file"
-          onChange={(e) => setResume(e.target.files[0])}
-          className="hidden"
-          name="resume"
-        />
-        <label
-          htmlFor="fileUpload"
-          className="border-2 border-dashed border-gray-400 p-6 w-11/12  text-center font-medium rounded-lg cursor-pointer bg-zinc-50 hover:bg-zinc-200 transition duration-300 block ml-11  mt-3 mb-2 text-lg font-medium text-gray-700"
-        >
-          {resume ? resume.name : "Upload Resume"}
-        </label>
-        <button
-          onClick={handleSubmit}
-          className=" float-end mr-[62px] bg-indigo-600 text-white font-semibold py-4 px-8 rounded-lg shadow-md hover:bg-indigo-800 focus:outline-none  transition duration-300 cursor-pointer"
-        >
-          Upload
-        </button>
+        <div className="w-full ml-10">
+          <label
+            className="text-lg font-bold text-gray-700"
+            htmlFor="file_input"
+          >
+            Job Description:
+          </label>
+          <textarea
+            id="textarea"
+            value={jobDescription}
+            onChange={(e) => setJobDescription(e.target.value)}
+            className="border border-gray-300 rounded-lg w-11/12 h-96 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 placeholder-gray-500 bg-zinc-50"
+            placeholder="Write your job description here"
+          />
+        </div>
+        <div className="w-full ml-10 my-2">
+          <input
+            id="fileUpload"
+            type="file"
+            onChange={(e) => setResume(e.target.files[0])}
+            className="hidden"
+            name="resume"
+          />
+          <label
+            htmlFor="fileUpload"
+            className="border-2 border-dashed border-gray-400 p-6 w-11/12  text-center font-medium rounded-lg cursor-pointer bg-zinc-50 hover:bg-zinc-200 transition duration-300 block text-lg font-medium text-gray-700"
+          >
+            {resume ? resume.name : "Upload Resume"}
+          </label>
+        </div>
+        <div className="w-11/12 flex justify-end ml-10">
+          <Button
+            type="submit"
+            variant="contained"
+            sx={{
+              backgroundColor: '#4f46e5',
+              color: 'white',
+              '&:hover': {
+                backgroundColor: '#3730a3',
+              },
+            }}
+            startIcon={<CloudUploadIcon />}
+            // onClick={handleSubmit}
+          >
+            Upload
+          </Button>
+        </div>
       </div>
+      </form>
     </>)
 }
 

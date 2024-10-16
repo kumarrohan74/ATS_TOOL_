@@ -68,7 +68,7 @@ function Candidatelist() {
     if (candidates) {
         rows = candidates.map((details) => {
             return {
-                id: details?._id, name: details?.name, email: details?.email, ats_score: details?.ats_score, applied_position: details?.applied_position,
+                id: details?._id, name: details?.name, email: details?.email, ats_score: Math.round(details?.ats_score), applied_position: details?.applied_position,
                 location: details?.location, status: details?.status, experience: details?.experience?.totalYears
             }
         })

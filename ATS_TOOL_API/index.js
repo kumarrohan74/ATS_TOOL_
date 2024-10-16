@@ -8,7 +8,7 @@ const pdfParse = require("pdf-parse");
 require('dotenv').config();
 const { connectDB, getDB } = require('./db');
 const { compareText, extractCurrentOrganization, extractEmail, extractExperience, extractLocation,
-extractName, extractPhone, extractSkills } = require("./utils/textMatch");
+    extractName, extractPhone, extractSkills, extractCandidateDescription } = require("./utils/textMatch");
 
 const { ObjectId } = require("mongodb")
 let objID;
@@ -43,25 +43,18 @@ app.get('/get-candidates', async (req, res) => {
     res.json({ candidates });
 });
 
-const upload = multer({ dest: "uploads/" });
+const storage = multer.memoryStorage();
+const upload = multer({ storage });
 
 app.post("/resume-upload", upload.single("resume"), async (req, res) => {
 
-    const resumePath = req.file.path;
+    const resumeBuffer = req.file.buffer;
+    const resumeName = req.file.originalname;
     const jobDescription = req.body.jobDescription;
 
     try {
-        const resumeBuffer = fs.readFileSync(resumePath);
         const resumeData = await pdfParse(resumeBuffer);
         const resumeText = resumeData.text;
-        // const name = extractName(resumeText); 
-        // const email = extractEmail(resumeText);
-        // const phone_number = extractPhone(resumeText);
-        // const ats_score = compareText(resumeText, jobDescription);
-        // const location = extractLocation(resumeText);
-        // const skills = extractSkills(resumeText);
-        // const experience = extractExperience(resumeText)
-        // const currentOrganisation = extractCurrentOrganization(resumeText)
         const extractedData = {
             name: extractName(resumeText),
             email: extractEmail(resumeText),
@@ -71,6 +64,8 @@ app.post("/resume-upload", upload.single("resume"), async (req, res) => {
             skills: extractSkills(resumeText),
             experience: extractExperience(resumeText),
             currentOrganisation: extractCurrentOrganization(resumeText),
+            candidateDescription: extractCandidateDescription(resumeText),
+            resume: { resumeName, resumeBuffer }
         };
         const ats_db = await connectDB();
         const collection = await ats_db.collection(candidates_db);

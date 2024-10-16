@@ -111,8 +111,8 @@ const extractLocation = (text) => {
         }
 
         let cleanedLine = cleanLocation(line);
-        if (cleanedLine && cleanedLine.match(/[a-zA-Z]+,\s*[a-zA-Z]+/)) { 
-            return cleanedLine; 
+        if (cleanedLine && cleanedLine.match(/[a-zA-Z]+,\s*[a-zA-Z]+/)) {
+            return cleanedLine;
         }
     }
     return 'Location not found';
@@ -129,7 +129,7 @@ const extractSkills = (text) => {
     ];
 
     const cleanSkill = (skill) => {
-        return skill.trim().replace(/\s+/g, ' '); 
+        return skill.trim().replace(/\s+/g, ' ');
     };
 
     let foundSkills = [];
@@ -165,7 +165,7 @@ const extractExperience = (text) => {
             if (unit.startsWith('year')) {
                 totalExperienceInMonths += value * 12;
             } else if (unit.startsWith('month')) {
-                totalExperienceInMonths += value; 
+                totalExperienceInMonths += value;
             }
         }
     }
@@ -175,12 +175,12 @@ const extractExperience = (text) => {
     return {
         totalYears,
         totalMonths,
-        totalExperienceInMonths 
+        totalExperienceInMonths
     };
 };
 
 const extractCurrentOrganization = (text) => {
-   
+
     const lines = text.split('\n').filter(line => line.trim() !== '');
 
     const explicitPatterns = [
@@ -204,7 +204,7 @@ const extractCurrentOrganization = (text) => {
         const experienceMatch = line.match(datePattern);
 
         if (experienceMatch) {
-            return experienceMatch[1].trim(); 
+            return experienceMatch[1].trim();
         }
 
         if (/(currently|present|senior|lead|manager)/i.test(line)) {
@@ -212,13 +212,52 @@ const extractCurrentOrganization = (text) => {
             const orgIndex = words.findIndex(word => /currently|present/i.test(word));
 
             if (orgIndex > 0) {
-                return words[orgIndex - 1].trim(); 
+                return words[orgIndex - 1].trim();
             }
         }
     }
     return 'Current organization not found';
 };
 
+const extractCandidateDescription = (resumeText) => {
+    // Normalize the text
+    const normalizedText = resumeText.replace(/\r\n/g, '\n').replace(/\r/g, '\n'); // Handle different line endings
+    const lines = normalizedText.split('\n').map(line => line.trim()).filter(line => line.length > 0);
 
-module.exports = { compareText, extractEmail, extractPhone, extractName, extractLocation, extractSkills, extractExperience,
-extractCurrentOrganization };
+    // Keywords that typically indicate the start of a candidate description
+    const descriptionKeywords = /(?:\bsummary\b|\babout me\b|\bprofile\b|\bobjective\b|\bprofessional summary\b|\bpersonal statement\b)/i;
+
+    // Keywords that typically indicate the start of other sections
+    const sectionEndKeywords = /(?:\bexperience\b|\beducation\b|\bskills\b|\bemployment\b|\bwork history\b)/i;
+
+    let description = '';
+    let capture = false;
+
+    // Loop through the lines to find the candidate description section
+    for (let i = 0; i < lines.length; i++) {
+        const line = lines[i];
+
+        // Start capturing text when we find a description keyword
+        if (descriptionKeywords.test(line)) {
+            capture = true;
+            continue; // Skip the line with the keyword
+        }
+
+        // Stop capturing when we encounter another section keyword
+        if (capture && sectionEndKeywords.test(line)) {
+            break; // Stop the loop once we hit the next section
+        }
+
+        // Collect the lines as part of the description
+        if (capture) {
+            description += line + ' ';
+        }
+    }
+
+    return description.trim() || 'Candidate description not found.';
+}
+
+module.exports = {
+    compareText, extractEmail, extractPhone, extractName, extractLocation, extractSkills, extractExperience,
+    extractCurrentOrganization, extractCandidateDescription
+};
