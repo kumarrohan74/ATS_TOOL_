@@ -11,6 +11,7 @@ function App() {
   const [isAuthenticated, setIsAuthenticated] = useState(false);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userInfo, setUserInfo] = useState(null);
+  const [tokenExpiryTime, setTokenExpiryTime] = useState(null);
 
   const fetchUserProfileFromToken = (accessToken) => {
     fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
@@ -34,6 +35,9 @@ function App() {
   const handleGoogleSignIn = useGoogleLogin({
     onSuccess: (response) => {
       localStorage.setItem('authToken', response.access_token);
+      const expiryTime = new Date().getTime() + response.expires_in * 1000;
+      console.log(expiryTime)
+      setTokenExpiryTime(expiryTime);
       fetchUserProfileFromToken(response.access_token)
     },
     onError: (error) => {
@@ -52,9 +56,30 @@ function App() {
     }
   };
 
+  const handleLogout = () => {
+    localStorage.removeItem('authToken');
+    window.location.href = '/';
+  };
+
+  useEffect(() => {
+    if (tokenExpiryTime) {
+      const currentTime = new Date().getTime();
+      const timeLeft = tokenExpiryTime - currentTime;
+      console.log(timeLeft)
+      const timeout = setTimeout(() => {
+        handleLogout();
+      }, timeLeft);
+
+      // Clear timeout on component unmount
+      return () => clearTimeout(timeout);
+    }
+  }, [tokenExpiryTime, handleLogout]);
+
   useEffect(() => {
     checkAuth();
   }, []);
+
+
 
   return (
 

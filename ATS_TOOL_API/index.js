@@ -79,7 +79,7 @@ const extractName = (text) => {
     let name = nameMatch[1].trim();
     if (!isCommonWord(name)) {
       return name;
-    }
+    } 
   }
 
   // Split the resume text into lines and iterate through them
@@ -146,7 +146,6 @@ app.post("/resume-upload", upload.single("resume"), async (req, res) => {
 app.get('/resume-upload',(req,res)=>{
   res.json({id:objID})
 });
-
 
   app.get('/candidate/:id', async (req, res) => {
     const candidate = await fetchCandidates(req.params.id);
