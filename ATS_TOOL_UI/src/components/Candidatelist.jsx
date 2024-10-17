@@ -46,7 +46,6 @@ const columns = [
 
 
 function Candidatelist() {
-  
     const apiURI = process.env.REACT_APP_API_URL;
     const [loader, setLoader] = useState(true);
     const [data, setData] = useState([])
@@ -75,7 +74,7 @@ function Candidatelist() {
     }
     return (
         <div className='m-8 w-full'>
-            <DataTable columns={columns} rows={rows} />
+            <DataTable columns={columns} rows={rows} loader={loader}  />
         </div>
     );
 }

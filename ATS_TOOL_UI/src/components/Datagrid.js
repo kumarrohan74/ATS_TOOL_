@@ -3,20 +3,19 @@ import { Box, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { CandidateContext } from './Context';
 
 function DataTable(props) {
-    const { loader } = React.useContext(CandidateContext);
+    const loader = props.loader;
     const rows = props.rows;
     const columns = props.columns;
     const [search, setSearch] = useState('');
     const navigate = useNavigate();
-   
+
     const handleSearch = (e) => {
         const value = e.target.value.toLowerCase();
         setSearch(value);
     };
-   
+
     const filteredRows = rows && rows.filter((row) =>
         columns.some((column) => {
             const value = String(row[column.field]).toLowerCase();
@@ -26,7 +25,6 @@ function DataTable(props) {
     );
     const handleSingleProfile = async (e) => {
         const apiURI = process.env.REACT_APP_API_URL
-        console.log(e.id)
         fetch(`${apiURI}/candidate/${e.id}`)
             .then((res) => {
                 console.log(res);
@@ -69,6 +67,7 @@ function DataTable(props) {
                     disableRowSelectionOnClick
                     loading={loader}
                     onRowClick={handleSingleProfile}
+                    className='cursor-pointer'
                 />
             </Box>
         </>

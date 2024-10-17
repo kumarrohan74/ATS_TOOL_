@@ -19,8 +19,7 @@ const style = {
 const url = process.env.REACT_APP_API_URL;
 
 export default function UploadModal(props) {
-
-    const { isOpen, closeModal, score, candidateId } = props.value;
+    const { isOpen, closeModal, score, candidateId, isJDChecked } = props.value;
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = React.useState(false)
 
@@ -49,14 +48,14 @@ export default function UploadModal(props) {
             >
                 <Box sx={style}>
                     <Typography id="modal-modal-title" className="text-center font-bold" sx={{ mt: 2, text: 'bold' }} variant="h5" component="h1">
-                        Successfully analysed and uploaded
+                        {isJDChecked ? 'Successfully analysed and uploaded' : 'Resume Successfully Uploaded'}
                     </Typography>
                     <Typography id="modal-modal-description" className="text-center" sx={{ mt: 2, text: 'bold' }} variant="h3" component="h1">
-                        <p>ATS Score : {score}%</p>
+                        {isJDChecked ? <p>ATS Score : {score}%</p> : <p></p>}
                     </Typography>
                     <Box display="flex" justifyContent="space-between" gap={4} mt={6}>
                         <Button variant="contained" onClick={HandleBackToProfile}>Check Profile</Button>
-                        <Button variant="outlined" onClick={closeModal}>Back to Add Profile</Button>
+                        <Button variant="outlined" onClick={closeModal}>Back to Upload Profile</Button>
                     </Box>
                 </Box>
             </Modal>

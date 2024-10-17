@@ -1,30 +1,35 @@
-import { useState } from "react";
+import React, { useState } from "react";
 import axios from "axios";
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
 import UploadModal from "./Modal";
-
+import ToggleSwitch from "./common/Checkbox";
+import { CandidateContext } from "./Context";
 
 function AddProfile() {
 
   const [isOpen, setIsOpen] = useState(false)
   const [resume, setResume] = useState(null);
-  const [jobDescription, setJobDescription] = useState("");
-  const [score, setScore] = useState();
+  const [jobDescription, setJobDescription] = useState('');
+  const [score, setScore] = useState(0);
   const [candidateId, setCandidateId] = useState('')
-
+  const {isJDChecked} = React.useContext(CandidateContext);
   const apiURI = process.env.REACT_APP_API_URL;
   const endpoint = '/resume-upload';
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if (!resume || !jobDescription) {
-      alert('Please upload pdf file');
+    if ((!resume && !jobDescription && isJDChecked) || (!resume && !isJDChecked)) {
+      alert('Please upload resume file');
       return;
     }
     const formData = new FormData();
     formData.append("resume", resume);
-    formData.append("jobDescription", jobDescription);
+    console.log(isJDChecked,' isjdchecked')
+    if(isJDChecked){
+      formData.append("jobDescription", jobDescription);
+    }
+    
 
     try {
       const response = await axios.post(`${apiURI}${endpoint}`, formData, {
@@ -33,8 +38,12 @@ function AddProfile() {
         },
       });
       setIsOpen(true);
-      setScore(Math.round(response.data.atsScore));
+      if(isJDChecked){
+        setScore(Math.round(response.data.atsScore));
+      }
+     
       setCandidateId(response.data.id);
+      console.log(candidateId, ' formdata candi id')
 
     } catch (error) {
       console.error("Error uploading files:", error);
@@ -44,23 +53,33 @@ function AddProfile() {
   const closeModal = () => setIsOpen(false)
   return (
     <>
-      {isOpen && <UploadModal value={{ isOpen, closeModal, score, candidateId }} />}
+      {isOpen && <UploadModal value={{ isOpen, closeModal, score, candidateId, isJDChecked }} />}
       <form onSubmit={handleSubmit} className="w-full">
       <div className="w-full h-screen mt-4">
         <div className="w-full ml-10">
+        <div className="flex justify-between w-11/12">
           <label
             className="text-lg font-bold text-gray-700"
             htmlFor="file_input"
           >
             Job Description:
-          </label>
+          </label> 
+          <div className="flex font-bold text-gray-700 ">
+              <h3 className=" mr-2 text-lg ">Check Ats Score:</h3>
+              <ToggleSwitch />
+            </div>
+        </div>
           <textarea
             id="textarea"
             value={jobDescription}
             onChange={(e) => setJobDescription(e.target.value)}
-            className="border border-gray-300 rounded-lg w-11/12 h-96 focus:outline-none focus:ring-2 focus:ring-blue-500 transition duration-300 placeholder-gray-500 bg-zinc-50"
+            className={`border border-gray-300 mt-2 rounded-lg w-11/12  pl-2
+                        h-96 focus:outline-none focus:ring-2 focus:ring-blue-500 
+                        transition duration-300 placeholder-gray-500 bg-zinc-50 
+                        ${!isJDChecked ? "cursor-not-allowed bg-gray-100 opacity-30" : ""} `}
             placeholder="Write your job description here"
-          />
+
+            disabled={!isJDChecked} />
         </div>
         <div className="w-full ml-10 my-2">
           <input

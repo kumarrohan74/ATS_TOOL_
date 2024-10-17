@@ -5,14 +5,13 @@ import MailIcon from '@mui/icons-material/Mail';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
-import CircularLoader from '../utils/Loader';
+import CircularLoader from './common/Loader';
 
 export default function CandidateProfile() {
 
   const location = useLocation();
   const list = location.state?.candidate;
   const skills = list?.skills || [];
-
   const [resume, setResume] = useState(list?.resume);
 
   return (<>
@@ -36,8 +35,8 @@ export default function CandidateProfile() {
             <p className="text-gray-600 text-lg"><strong><LocalPhoneIcon /></strong> {list?.phone_number}</p>
             <p className="text-gray-600 text-lg"><strong><LocationOnIcon /></strong> {list?.location}</p>
             <p className="text-gray-600 text-lg"><strong><PictureAsPdfIcon /><a className="text-blue-600 text-underline" href={`data:application/pdf;base64,${resume.resumeBuffer}`} download={resume.resumeName}>
-                            {resume.resumeName}
-                        </a></strong> </p>
+              {resume.resumeName}
+            </a></strong> </p>
           </div>
         </div>
       </div>
