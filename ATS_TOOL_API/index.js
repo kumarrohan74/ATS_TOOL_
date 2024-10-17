@@ -50,10 +50,8 @@ app.post("/resume-upload", upload.single("resume"), async (req, res) => {
 
     const resumeBuffer = req.file.buffer;
     const resumeName = req.file.originalname;
-    let jobDescription;
-    if(req.body.jobDescription){
-        jobDescription = req.body.jobDescription;
-    }
+    const jobDescription = req.body.jobDescription ? req.body.jobDescription : null;
+
 
     try {
         const resumeData = await pdfParse(resumeBuffer);
@@ -62,7 +60,7 @@ app.post("/resume-upload", upload.single("resume"), async (req, res) => {
             name: extractName(resumeText),
             email: extractEmail(resumeText),
             phone_number: extractPhone(resumeText),
-            ats_score: compareText(resumeText, jobDescription),
+            ats_score: jobDescription === null ? 0 : compareText(resumeText, jobDescription),
             location: extractLocation(resumeText),
             skills: extractSkills(resumeText),
             experience: extractExperience(resumeText),
@@ -73,16 +71,11 @@ app.post("/resume-upload", upload.single("resume"), async (req, res) => {
         const ats_db = await connectDB();
         const collection = await ats_db.collection(candidates_db);
         const result = await collection.insertOne(extractedData);
-        if(!jobDescription){
-            res.status(201).json({atsScore: 0, message: 'Data added', id: result.insertedId.toString() })
-        }
         res.status(201).json({ atsScore: Number(extractedData.ats_score), message: 'Data added', id: result.insertedId.toString() })
+
     } catch (error) {
         res.status(500).send("Error parsing resume");
     }
-});
-app.get('/resume-upload', (req, res) => {
-    res.json({ id: objID })
 });
 
 app.get('/candidate/:id', async (req, res) => {

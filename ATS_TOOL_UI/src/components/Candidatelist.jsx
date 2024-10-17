@@ -74,7 +74,7 @@ function Candidatelist() {
     }
     return (
         <div className='m-8 w-full'>
-            <DataTable columns={columns} rows={rows} loader={loader}  />
+            <DataTable columns={columns} rows={rows} loader={loader} />
         </div>
     );
 }
