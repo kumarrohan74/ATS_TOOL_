@@ -32,7 +32,7 @@ const Sidebar = () => {
     <div className="w-[250px] relative border-0 shadow-lg shadow-right h-screen bg-gray-100 flex-shrink-0">
       <ul>
         <li className={` p-4 pl-0 cursor-pointer text-center text-gray-700 font-bold hover:bg-indigo-100 hover:text-indigo-600 ${activePath === '/candidatelist' ? 'text-indigo-600 bg-indigo-100' : ''}`} id='candidatelist' onClick={(e) => handleClick(e)}>Candidate list</li>
-        <li className={`mb-3 p-4 pl-0 text-center text-gray-700  text-base cursor-pointer font-bold hover:bg-indigo-100 hover:text-indigo-600 ${activePath === '/addprofile' ? 'text-indigo-600 bg-indigo-100' : ''}`} id='addProfile' onClick={(e) => handleClick(e)}>Upload Resume</li>
+        <li className={`mb-3 p-4 pl-0 text-center text-gray-700  text-base cursor-pointer font-bold hover:bg-indigo-100 hover:text-indigo-600 ${activePath === '/addprofile' ? 'text-indigo-600 bg-indigo-100' : ''}`} id='addProfile' onClick={(e) => handleClick(e)}>Upload Profile</li>
       </ul>
     </div>
 
