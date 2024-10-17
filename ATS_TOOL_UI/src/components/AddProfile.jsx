@@ -25,7 +25,6 @@ function AddProfile() {
     }
     const formData = new FormData();
     formData.append("resume", resume);
-    console.log(isJDChecked, ' isjdchecked')
     if (isJDChecked) {
       formData.append("jobDescription", jobDescription);
     }
@@ -43,7 +42,6 @@ function AddProfile() {
       }
 
       setCandidateId(response.data.id);
-      console.log(candidateId, ' formdata candi id')
 
     } catch (error) {
       console.error("Error uploading files:", error);
