@@ -3,6 +3,8 @@ import { Box, TextField } from '@mui/material';
 import { DataGrid } from '@mui/x-data-grid';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { API_URI, END_POINTS, ALERTS } from './Constants';
+const { CANDIDATE } = END_POINTS;
 
 function DataTable(props) {
     const loader = props.loader;
@@ -10,36 +12,29 @@ function DataTable(props) {
     const columns = props.columns;
     const [search, setSearch] = useState('');
     const navigate = useNavigate();
-
     const handleSearch = (e) => {
         const value = e.target.value.toLowerCase();
         setSearch(value);
     };
-
     const filteredRows = rows && rows.filter((row) =>
         columns.some((column) => {
             const value = String(row[column.field]).toLowerCase();
-            console.log(column.field)
             return value.includes(search);
         })
     );
     const handleSingleProfile = async (e) => {
-        const apiURI = process.env.REACT_APP_API_URL
-        fetch(`${apiURI}/candidate/${e.id}`)
+        fetch(`${API_URI}${CANDIDATE}/${e.id}`)
             .then((res) => {
-                console.log(res);
                 if (!res.ok) {
-                    throw new Error(`HTTP error! status: ${res.status}`);
+                    throw new Error(`${ALERTS.HTTP_ERROR} : ${res.status}`);
                 }
-
                 return res.json();
             })
             .then((data) => {
-                navigate(`/candidate/${e.id}`, { state: { candidate: data } });
+                navigate(`${CANDIDATE}/${e.id}`, { state: { candidate: data } });
             })
             .catch((err) => console.error(err))
     }
-
     return (
         <>
             <Box className="w-full mb-4">
@@ -71,8 +66,6 @@ function DataTable(props) {
                 />
             </Box>
         </>
-
     );
 }
-
 export default DataTable;

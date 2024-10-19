@@ -24,7 +24,7 @@ const ATSScoreCard = ({ score }) => {
                     cx="50"
                     cy="50"
                     r={radius}
-                    stroke="lightgray"
+                    stroke="gray"
                     strokeWidth="10"
                     fill="none"
                 />

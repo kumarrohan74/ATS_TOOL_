@@ -1,14 +1,12 @@
-import React, { useState } from 'react';
+import React from 'react';
 import { CandidateContext } from '../Context';
 
 function ToggleSwitch() {
     const { isJDChecked, setIsJDChecked } = React.useContext(CandidateContext);
-
     // Handle the toggle switch
     const handleToggle = () => {
         setIsJDChecked(!isJDChecked);
     };
-
     return (
         <label className="relative inline-flex items-center cursor-pointer select-none">
             {/* Hidden Checkbox */}

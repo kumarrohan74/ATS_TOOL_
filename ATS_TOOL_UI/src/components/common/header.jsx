@@ -2,12 +2,12 @@ import React, { useState, useEffect } from "react";
 import { useRef } from "react";
 import Button from '@mui/material/Button';
 import { getInitials } from "../../utils/getName";
+import { END_POINTS } from "../Constants";
+const { CANDIDATE_LIST } = END_POINTS
 
 const Header = ({ userInfo }) => {
-
     const [isOpen, setIsOpen] = useState(false);
     const ref = useRef(null);
-
     useEffect(() => {
         const handleClickOutside = (event) => {
             if (ref.current && !ref.current.contains(event.target)) {
@@ -21,15 +21,13 @@ const Header = ({ userInfo }) => {
     }, []);
 
     const handleHome = () => {
-        window.location.href = '/candidatelist';
+        window.location.href = CANDIDATE_LIST;
     }
-
     const handleLogout = () => {
         localStorage.removeItem('authToken');
         setIsOpen(false);
         window.location.href = '/';
     };
-
     const Logout = () => {
         return (
             <div ref={ref} className="absolute right-2 mt-[54px] w-48 p-4 border rounded shadow-lg bg-white z-10">
@@ -42,7 +40,6 @@ const Header = ({ userInfo }) => {
             </div>
         )
     }
-
     return (
         userInfo?.name && (
             <div className="flex h-[60px] cursor-pointer bg-indigo-600 hover:bg-indigo-500 justify-between items-center bg-gray-100 p-4">

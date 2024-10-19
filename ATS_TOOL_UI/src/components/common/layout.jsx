@@ -5,7 +5,6 @@ import Header from "./header";
 import { DataProvider } from "../Context";
 
 const Layout = ({ userData, children }) => {
-
     return (
         <div>
             <DataProvider>

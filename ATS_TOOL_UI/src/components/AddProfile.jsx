@@ -2,9 +2,11 @@ import React, { useState } from "react";
 import axios from "axios";
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
-import UploadModal from "./Modal";
+import Dropdown from "./Dropdown";
 import ToggleSwitch from "./common/Checkbox";
 import { CandidateContext } from "./Context";
+import UploadModal from "./Modal";
+import { ALERTS, API_URI, END_POINTS } from "./Constants";
 
 function AddProfile() {
 
@@ -13,25 +15,20 @@ function AddProfile() {
   const [jobDescription, setJobDescription] = useState('');
   const [score, setScore] = useState(0);
   const [candidateId, setCandidateId] = useState('')
-  const { isJDChecked } = React.useContext(CandidateContext);
-  const apiURI = process.env.REACT_APP_API_URL;
-  const endpoint = '/resume-upload';
+  const { isJDChecked, applied_position,application_status } = React.useContext(CandidateContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    if ((!resume && !jobDescription && isJDChecked) || (!resume && !isJDChecked)) {
-      alert('Please upload resume file');
-      return;
-    }
     const formData = new FormData();
+      formData.append("application_status", "Profile Added");
     formData.append("resume", resume);
+    formData.append("applied_position", applied_position);
+    
     if (isJDChecked) {
       formData.append("jobDescription", jobDescription);
     }
-
-
     try {
-      const response = await axios.post(`${apiURI}${endpoint}`, formData, {
+      const response = await axios.post(`${API_URI}${END_POINTS.UPLOAD_RESUME}`, formData, {
         headers: {
           'Content-Type': 'multipart/form-data',
         },
@@ -44,10 +41,9 @@ function AddProfile() {
       setCandidateId(response.data.id);
 
     } catch (error) {
-      console.error("Error uploading files:", error);
+      console.error(ALERTS.ERROR_UPLOAD, error);
     }
   };
-
   const closeModal = () => setIsOpen(false)
   return (
     <>
@@ -76,7 +72,7 @@ function AddProfile() {
                         transition duration-300 placeholder-gray-500 bg-zinc-50 
                         ${!isJDChecked ? "cursor-not-allowed bg-gray-100 opacity-30" : ""} `}
               placeholder="Write your job description here"
-
+              required={isJDChecked}
               disabled={!isJDChecked} />
           </div>
           <div className="w-full ml-10 my-2">
@@ -86,15 +82,18 @@ function AddProfile() {
               onChange={(e) => setResume(e.target.files[0])}
               className="hidden"
               name="resume"
-            />
+              required />
             <label
               htmlFor="fileUpload"
               className="border-2 border-dashed border-gray-400 p-6 w-11/12  text-center font-medium rounded-lg cursor-pointer bg-zinc-50 hover:bg-zinc-200 transition duration-300 block text-lg font-medium text-gray-700"
-            >
+              required>
               {resume ? resume.name : "Upload Resume"}
             </label>
           </div>
           <div className="w-11/12 flex justify-end ml-10">
+            <div className="mr-4">
+              <Dropdown dropdown="addProfile"/>
+            </div>
             <Button
               type="submit"
               variant="contained"
@@ -106,7 +105,7 @@ function AddProfile() {
                 },
               }}
               startIcon={<CloudUploadIcon />}
-            // onClick={handleSubmit}
+              disabled={!resume ? true : false}
             >
               Upload
             </Button>

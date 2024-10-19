@@ -31,7 +31,6 @@ function App() {
     setIsAuthenticated(true)
     setIsLoggedIn(true);
   }
-
   const handleGoogleSignIn = useGoogleLogin({
     onSuccess: (response) => {
       localStorage.setItem('authToken', response.access_token);
@@ -45,7 +44,6 @@ function App() {
       setIsAuthenticated(false)
     },
   });
-
   const checkAuth = () => {
     const token = localStorage.getItem('authToken');
     if (token) {
@@ -55,7 +53,6 @@ function App() {
       setIsLoggedIn(false)
     }
   };
-
   const handleLogout = () => {
     localStorage.removeItem('authToken');
     window.location.href = '/';
