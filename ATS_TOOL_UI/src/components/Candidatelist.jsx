@@ -73,7 +73,7 @@ function Candidatelist() {
         })
     }
     return (
-        <div className='m-8 w-full'>
+        <div className='m-8 w-full h-screen'>
             <DataTable columns={columns} rows={rows} loader={loader} />
         </div>
     );

@@ -48,7 +48,7 @@ export default function UploadModal(props) {
             >
                 <Box sx={style}>
                     <Typography id="modal-modal-title" className="text-center font-bold" sx={{ mt: 2, text: 'bold' }} variant="h5" component="h1">
-                        {isJDChecked ? 'Successfully analysed and uploaded' : 'Resume Successfully Uploaded'}
+                        {isJDChecked ? 'Successfully analysed' : 'Profile successfully uploaded'}
                     </Typography>
                     <Typography id="modal-modal-description" className="text-center" sx={{ mt: 2, text: 'bold' }} variant="h3" component="h1">
                         {isJDChecked ? <p>ATS Score : {score}%</p> : <p></p>}
