@@ -6,6 +6,7 @@ import UploadModal from "./Modal";
 import ToggleSwitch from "./common/Checkbox";
 import { CandidateContext } from "./Context";
 import DataTable from "./Datagrid";
+import { COLUMNS } from './Constants';
 
 const columns = [
     { field: 'id', headerName: 'ID', width: 90 },
@@ -142,7 +143,7 @@ function ATSMatch() {
                     <div className="w-full">
                         <p className="text-2xl py-2 mx-10 font-bold">Matched Candidates</p>
                         <div className="w-11/12 mx-10 shadow-lg p-8" style={{ boxShadow: "0px 4px 6px rgba(128, 128, 128, 0.5)" }}>
-                            <DataTable columns={columns} rows={filteredRows} loader={loader} />
+                            <DataTable columns={COLUMNS} rows={filteredRows} loader={loader} />
                         </div>
                     </div>
                 )}
