@@ -1,7 +1,8 @@
 import React, { useState } from "react";
 import { useEffect } from "react";
 import { useLocation, useNavigate } from "react-router-dom";
-
+import { END_POINTS } from "../Constants";
+const {CANDIDATE_LIST,ADD_PROFILE} = END_POINTS
 const Sidebar = () => {
 
   const location = useLocation();
@@ -10,7 +11,7 @@ const Sidebar = () => {
 
   useEffect(() => {
     if (location.pathname === "/") {
-      setActivePath('/candidatelist')
+      setActivePath(CANDIDATE_LIST)
     }
     else {
       setActivePath(location.pathname)
@@ -19,12 +20,12 @@ const Sidebar = () => {
 
   const handleClick = (e) => {
     if (e.target.id === 'candidatelist') {
-      navigate('/candidatelist')
-      setActivePath('/candidatelist')
+      navigate(CANDIDATE_LIST)
+      setActivePath(CANDIDATE_LIST)
     }
     if (e.target.id === 'addProfile') {
-      navigate('/addprofile')
-      setActivePath('/addprofile')
+      navigate(ADD_PROFILE)
+      setActivePath(ADD_PROFILE)
     }
     if (e.target.id === 'atsMatch') {
       navigate('/atsMatch')

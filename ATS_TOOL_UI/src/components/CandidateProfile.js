@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useContext, useState } from 'react';
 import { useLocation } from "react-router-dom";
 import ATSScoreCard from "./ATSScoreCard";
 import MailIcon from '@mui/icons-material/Mail';
@@ -6,26 +6,56 @@ import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
 import LocationOnIcon from '@mui/icons-material/LocationOn';
 import PictureAsPdfIcon from '@mui/icons-material/PictureAsPdf';
 import CircularLoader from './common/Loader';
-
+import { API_URI, END_POINTS, ALERTS } from './Constants';
+import Dropdown from './Dropdown';
+import { Button } from '@mui/material';
+import { CandidateContext } from './Context';
+import axios from 'axios';
 export default function CandidateProfile() {
-
+  const { application_status } = useContext(CandidateContext)
+  const [isClose, setIsClose] = useState(true);
+  const [loader, setLoader] = useState(false);
   const location = useLocation();
   const list = location.state?.candidate;
   const skills = list?.skills || [];
+  const [status, setStatus] = useState(list?.status)
   const [resume, setResume] = useState(list?.resume);
-
+  const handleClose = () => {
+    setIsClose(false);
+  }
+  const handleStatusClick = async () => {
+    setLoader(true);
+    try {
+      axios.patch(`${API_URI}${END_POINTS.CANDIDATE}/${list._id}`, {
+        status: application_status,
+        id: list._id
+      },
+        {
+          headers: {
+            'Content-Type': 'application/json',
+          },
+        }).then(result => {
+          setStatus(result.data.status)
+          setLoader(false)
+        })
+    }
+    catch (e) {
+      console.log('error edit', e);
+    }
+    setIsClose(true);
+  }
   return (<>
     <div className="bg-slate-50 w-screen min-h-screen p-6">
-      <div class="flex flex-wrap w-full">
-        <div class="w-full rounded-lg overflow-hidden shadow-lg border border-gray-200 m-2 my-4 p-6 flex">
-          <div class="flex-shrink-0">
-            <img class="w-32 h-32 rounded-full object-cover" src="https://via.placeholder.com/150" alt="Candidate Photo" />
+      <div className="flex flex-wrap w-full">
+        <div className="w-full rounded-lg overflow-hidden shadow-lg border border-gray-200 m-2 my-4 p-6 flex">
+          <div className="flex-shrink-0">
+            <img className="w-32 h-32 rounded-full object-cover" src="https://via.placeholder.com/150" alt="Candidate Photo" />
           </div>
-          <div class="ml-6">
-            <h2 class="font-bold text-2xl">{list?.name}</h2>
-            <p class="text-gray-700 text-lg">{list?.category}</p>
-            <p class="text-gray-500 text-base">ABC Company Pvt.Ltd.</p>
-            <p class="text-gray-500 text-base">{list?.education}</p>
+          <div className="ml-6">
+            <h2 className="font-bold text-2xl">{list?.name}</h2>
+            <p className="text-gray-700 text-lg">{list?.category}</p>
+            <p className="text-gray-500 text-base">ABC Company Pvt.Ltd.</p>
+            <p className="text-gray-500 text-base">{list?.education}</p>
           </div>
           <div className="ml-14">
             <ATSScoreCard score={list?.ats_score} />
@@ -34,8 +64,8 @@ export default function CandidateProfile() {
             <p className="text-gray-600 text-lg"><strong><MailIcon /></strong> {list?.email}</p>
             <p className="text-gray-600 text-lg"><strong><LocalPhoneIcon /></strong> {list?.phone_number}</p>
             <p className="text-gray-600 text-lg"><strong><LocationOnIcon /></strong> {list?.location}</p>
-            <p className="text-gray-600 text-lg"><strong><PictureAsPdfIcon /><a className="text-blue-600 text-underline" href={`data:application/pdf;base64,${resume.resumeBuffer}`} download={resume.resumeName}>
-              {resume.resumeName}
+            <p className="text-gray-600 text-lg"><strong><PictureAsPdfIcon /><a className="text-blue-600 text-underline" href={`data:application/pdf;base64,${resume?.resumeBuffer}`} download={resume?.resumeName}>
+              {resume?.resumeName}
             </a></strong> </p>
           </div>
         </div>
@@ -52,9 +82,13 @@ export default function CandidateProfile() {
               ))}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow-lg p-6 min-h-[100px] flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 min-h-auto w-auto flex items-center justify-center">
             <div className="text-center">
-              <h3 className="text-2xl font-bold mb-4 text-indigo-800">{list?.status}</h3>
+              <h3 className="text-lg font-bold mb-4 text-indigo-800">Role:<span className='text-md font-bold text-indigo-700'> {list?.applied_position}</span></h3>
+              <h3 className="text-lg font-bold mb-4 text-indigo-800">Status:<span className='text-md font-bold text-indigo-700'> {loader ? <CircularLoader size={1} thickness={1} /> : status}</span></h3>
+              {isClose ? <Button variant='outlined' onClick={handleClose}>Edit status</Button>
+                : <div className='flex justify-around w-auto'><Dropdown dropdown="applicantStatus" /><Button variant='contained' className='w-auto' onClick={handleStatusClick}>save</Button></div>
+              }
             </div>
           </div>
         </div>
@@ -62,7 +96,7 @@ export default function CandidateProfile() {
           <div className="bg-white rounded-lg shadow-lg p-6 min-h-[300px]">
             <h3 className="text-2xl font-bold mb-4 text-indigo-800">Candidate's Description</h3>
             <p className="text-lg text-gray-700">
-              {list?.description || "No description available for this candidate."}
+              {list?.description || ALERTS.NO_DESCRIPTION}
             </p>
           </div>
         </div>

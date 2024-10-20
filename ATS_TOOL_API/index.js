@@ -10,7 +10,8 @@ const { connectDB, getDB } = require('./db');
 const { compareText, extractCurrentOrganization, extractEmail, extractExperience, extractLocation,
     extractName, extractPhone, extractSkills, extractCandidateDescription } = require("./utils/textMatch");
 
-const { ObjectId } = require("mongodb")
+const { ObjectId } = require("mongodb");
+const { serverConsts, STATUS_CODES, mongoDBConsts, messages, END_POINTS, DATABASE_LISTS } = require('./Constants')
 let objID;
 
 const app = express();
@@ -26,11 +27,12 @@ app.use(function (req, res, next) {
     next();
 });
 
-const candidates_db = 'candidates_list_updated';
+const { CANDIDATES_DB } = DATABASE_LISTS;
+
 connectDB().then(() => {
-    console.log('MongoDB connection established.');
+    console.log(mongoDBConsts.mongodb_connection_established);
 }).catch((error) => {
-    console.error('Failed to connect to MongoDB:', error);
+    console.error(mongoDBConsts.failed_to_connect_to_mongodb, error);
 });
 
 app.get('/api-health', async (req, res) => {
@@ -38,19 +40,19 @@ app.get('/api-health', async (req, res) => {
 });
 
 
-app.get('/get-candidates', async (req, res) => {
+app.get(END_POINTS.GET_CANDIDATES, async (req, res) => {
     const candidates = await fetchCandidates("true");
     res.json({ candidates });
 });
-
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-app.post("/resume-upload", upload.single("resume"), async (req, res) => {
-
+app.post(END_POINTS.RESUME_UPLOAD, upload.single("resume"), async (req, res) => {
     const resumeBuffer = req.file.buffer;
     const resumeName = req.file.originalname;
     const jobDescription = req.body.jobDescription ? req.body.jobDescription : null;
+    const applied_position = req.body.applied_position;
+    const application_status = req.body.application_status;
 
     try {
         const resumeData = await pdfParse(resumeBuffer);
@@ -65,27 +67,45 @@ app.post("/resume-upload", upload.single("resume"), async (req, res) => {
             experience: extractExperience(resumeText),
             currentOrganisation: extractCurrentOrganization(resumeText),
             candidateDescription: extractCandidateDescription(resumeText),
+            applied_position,
+            status: application_status,
             resume: { resumeName, resumeBuffer, resumeText }
         };
+        console.log(extractedData)
         if (jobDescription !== null) {
-            res.status(201).json({ atsScore: Number(extractedData.ats_score), message: 'ATS score successfully generated' })
-        }
-        else {
-            const ats_db = await connectDB();
-            const collection = await ats_db.collection(candidates_db);
-            const result = await collection.insertOne(extractedData);
-            res.status(201).json({ atsScore: Number(extractedData.ats_score), message: 'Data added', id: result.insertedId.toString() })
-        }
+          res.status(201).json({ atsScore: Number(extractedData.ats_score), message: 'ATS score successfully generated' })
+      }
+      else {
+        console.log('here')
+          const ats_db = await connectDB();
+          const collection = await ats_db.collection(CANDIDATES_DB);
+          const result = await collection.insertOne(extractedData);
+          res.status(201).json({ atsScore: Number(extractedData.ats_score), message: 'Data added', id: result.insertedId.toString() })
+      }
     } catch (error) {
-        res.status(500).send("Error parsing resume");
+        res.status(STATUS_CODES.SERVER_ERROR).send(serverConsts.error_parsing_resume);
     }
 });
 
-async function fetchCandidates(value) {
+app.get(END_POINTS.CANDIDATE_ID, async (req, res) => {
+    const candidate = await fetchCandidates(req.params.id);
+    res.status(STATUS_CODES.SUCCESS).json(candidate);
+});
 
+app.patch(END_POINTS.CANDIDATE_ID, async (req, res) => {
+    const { status, id } = req.body;
+    console.log(status, new ObjectId(id))
+    const ats_db = await connectDB();
+    const collection = await ats_db.collection(CANDIDATES_DB);
+    const result = await collection.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { status: status } }, { returnDocument: 'after' });
+    const updatedResponse = await collection.findOne({_id: new ObjectId(id)})
+    res.json({ status: result.status, message: "Status updated", updatedData: updatedResponse });
+});
+
+async function fetchCandidates(value) {
     try {
         const db = getDB();
-        const candidatesCollection = db.collection(candidates_db);
+        const candidatesCollection = db.collection(CANDIDATES_DB);
         let candidates
         if (value === "true") {
             candidates = await candidatesCollection.find({}, { projection: { skills: 0, education: 0, date_applied: 0, category: 0, id: 0, comments: 0, resume_url: 0 } }).sort({ _id: -1 }).toArray();
@@ -95,7 +115,7 @@ async function fetchCandidates(value) {
         }
         return candidates;
     } catch (error) {
-        console.error("Error fetching candidates:", error);
+        console.error(serverConsts.error_fetching_candidates, error);
         throw error;
     }
 }
@@ -121,7 +141,7 @@ const generateScoreByResume = (resumeText, jobDescription) => {
 async function fetchCandidatesByScore(jobDescription, atsScore) {
     try {
         const ats_db = await connectDB();
-        const collection = await ats_db.collection(candidates_db);
+        const collection = await ats_db.collection(CANDIDATES_DB);
         const result = await collection.find({}).toArray();
         const candidatePromises = result.map(async (candidate) => {
             const atsGeneratedScore = generateScoreByResume(candidate.resume.resumeText, jobDescription);
@@ -148,5 +168,5 @@ async function fetchCandidatesByScore(jobDescription, atsScore) {
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {
-    console.log(`Server is running on port ${PORT}`);
+    console.log(`${serverConsts.server_running} ${PORT}`);
 });
