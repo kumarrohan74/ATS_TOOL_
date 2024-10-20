@@ -9,7 +9,7 @@ const STATUS_CODES = {
 };
 const DATABASE_LISTS = {
     ATS_MASTER_DATA: "ATS_master_data",
-    CANDIDATES_DB: 'candidates_list',
+    CANDIDATES_DB: 'candidates_list_updated',
 };
 const END_POINTS = {
     GET_CANDIDATES: "/get-candidates",

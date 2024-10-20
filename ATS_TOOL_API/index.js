@@ -71,12 +71,14 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.single("resume"), async (req, res) => 
             status: application_status,
             resume: { resumeName, resumeBuffer, resumeText }
         };
+        console.log(extractedData)
         if (jobDescription !== null) {
           res.status(201).json({ atsScore: Number(extractedData.ats_score), message: 'ATS score successfully generated' })
       }
       else {
+        console.log('here')
           const ats_db = await connectDB();
-          const collection = await ats_db.collection(candidates_db);
+          const collection = await ats_db.collection(CANDIDATES_DB);
           const result = await collection.insertOne(extractedData);
           res.status(201).json({ atsScore: Number(extractedData.ats_score), message: 'Data added', id: result.insertedId.toString() })
       }
@@ -96,7 +98,8 @@ app.patch(END_POINTS.CANDIDATE_ID, async (req, res) => {
     const ats_db = await connectDB();
     const collection = await ats_db.collection(CANDIDATES_DB);
     const result = await collection.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { status: status } }, { returnDocument: 'after' });
-    res.json({ status: result.status, message: "Status updated" });
+    const updatedResponse = await collection.findOne({_id: new ObjectId(id)})
+    res.json({ status: result.status, message: "Status updated", updatedData: updatedResponse });
 });
 
 async function fetchCandidates(value) {
@@ -138,7 +141,7 @@ const generateScoreByResume = (resumeText, jobDescription) => {
 async function fetchCandidatesByScore(jobDescription, atsScore) {
     try {
         const ats_db = await connectDB();
-        const collection = await ats_db.collection(candidates_db);
+        const collection = await ats_db.collection(CANDIDATES_DB);
         const result = await collection.find({}).toArray();
         const candidatePromises = result.map(async (candidate) => {
             const atsGeneratedScore = generateScoreByResume(candidate.resume.resumeText, jobDescription);
