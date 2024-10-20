@@ -29,6 +29,7 @@ export default function Dropdown(props) {
         value={dropdown === "addProfile" ? applied_position : application_status}
         label={dropdown === "addProfile" ? "Role" : "Status"}
         onChange={handleChange}
+        disabled={props.disabled}
       >
         {options.map((option, i) => <MenuItem value={option} key={i + 1}>{option}</MenuItem>)}
       </Select>

@@ -29,6 +29,9 @@ const COLUMNS = [
         field: 'name',
         headerName: 'Full Name',
         width: 180,
+        renderCell: (params) => (
+            <span style={{ color: 'blue' }}>{params.value}</span>
+        ),
     },
     {
         field: 'email',

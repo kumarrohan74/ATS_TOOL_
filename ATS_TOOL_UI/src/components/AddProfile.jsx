@@ -92,7 +92,7 @@ function AddProfile() {
           </div>
           <div className="w-11/12 flex justify-end ml-10">
             <div className="mr-4">
-              <Dropdown dropdown="addProfile"/>
+              <Dropdown dropdown="addProfile" disabled={isJDChecked ? true : false}/>
             </div>
             <Button
               type="submit"
@@ -107,7 +107,7 @@ function AddProfile() {
               startIcon={<CloudUploadIcon />}
               disabled={!resume ? true : false}
             >
-              Upload
+             {isJDChecked ? `Check ATS Score` : `Upload`}
             </Button>
           </div>
         </div>

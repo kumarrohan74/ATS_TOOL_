@@ -5,6 +5,7 @@ import DataTable from './Datagrid';
 import { API_URI, END_POINTS, COLUMNS } from './Constants';
 const { GET_CANDIDATES } = END_POINTS;
 function Candidatelist() {
+    
     const [loader, setLoader] = useState(true);
     const [data, setData] = useState([]);
     useEffect(() => {
@@ -27,7 +28,7 @@ function Candidatelist() {
         })
     }
     return (
-        <div className='m-8 w-full h-screen'>
+        <div className='m-8 w-11/12 h-screen'>
             <DataTable columns={COLUMNS} rows={rows} loader={loader} />
         </div>
     );
