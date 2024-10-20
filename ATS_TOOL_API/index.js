@@ -28,6 +28,7 @@ app.use(function (req, res, next) {
 });
 
 const { CANDIDATES_DB } = DATABASE_LISTS;
+
 connectDB().then(() => {
     console.log(mongoDBConsts.mongodb_connection_established);
 }).catch((error) => {
@@ -52,6 +53,7 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.single("resume"), async (req, res) => 
     const jobDescription = req.body.jobDescription ? req.body.jobDescription : null;
     const applied_position = req.body.applied_position;
     const application_status = req.body.application_status;
+
     try {
         const resumeData = await pdfParse(resumeBuffer);
         const resumeText = resumeData.text;
@@ -67,12 +69,17 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.single("resume"), async (req, res) => 
             candidateDescription: extractCandidateDescription(resumeText),
             applied_position,
             status: application_status,
-            resume: { resumeName, resumeBuffer }
+            resume: { resumeName, resumeBuffer, resumeText }
         };
-        const ats_db = await connectDB();
-        const collection = await ats_db.collection(CANDIDATES_DB);
-        const result = await collection.insertOne(extractedData);
-        res.status(STATUS_CODES.CREATED).json({ atsScore: Number(extractedData.ats_score), message: messages.data_added, id: result.insertedId.toString() })
+        if (jobDescription !== null) {
+          res.status(201).json({ atsScore: Number(extractedData.ats_score), message: 'ATS score successfully generated' })
+      }
+      else {
+          const ats_db = await connectDB();
+          const collection = await ats_db.collection(candidates_db);
+          const result = await collection.insertOne(extractedData);
+          res.status(201).json({ atsScore: Number(extractedData.ats_score), message: 'Data added', id: result.insertedId.toString() })
+      }
     } catch (error) {
         res.status(STATUS_CODES.SERVER_ERROR).send(serverConsts.error_parsing_resume);
     }
@@ -91,6 +98,7 @@ app.patch(END_POINTS.CANDIDATE_ID, async (req, res) => {
     const result = await collection.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { status: status } }, { returnDocument: 'after' });
     res.json({ status: result.status, message: "Status updated" });
 });
+
 async function fetchCandidates(value) {
     try {
         const db = getDB();
@@ -109,6 +117,51 @@ async function fetchCandidates(value) {
     }
 }
 
+app.get('/candidate/:id', async (req, res) => {
+    const candidate = await fetchCandidates(req.params.id);
+    res.json(candidate)
+});
+
+app.post('/getCandidatesByScore', async (req, res) => {
+    const selectedCandidates = [];
+    const response = await fetchCandidatesByScore(req.body.jobDescription, req.body.score)
+    selectedCandidates.push(response)
+    res.json({ response: selectedCandidates })
+});
+
+
+const generateScoreByResume = (resumeText, jobDescription) => {
+    let atsScore = compareText(resumeText, jobDescription)
+    return atsScore;
+}
+
+async function fetchCandidatesByScore(jobDescription, atsScore) {
+    try {
+        const ats_db = await connectDB();
+        const collection = await ats_db.collection(candidates_db);
+        const result = await collection.find({}).toArray();
+        const candidatePromises = result.map(async (candidate) => {
+            const atsGeneratedScore = generateScoreByResume(candidate.resume.resumeText, jobDescription);
+            if (atsGeneratedScore >= atsScore) {
+                const updatedScore = await collection.updateOne(
+                    { _id: candidate._id },
+                    { $set: { ats_score: atsGeneratedScore } }
+                );
+                const selectedCandidate = await collection.find(
+                    { _id: candidate._id },
+                    { projection: { resume: 0 } }
+                ).toArray();
+                return selectedCandidate[0];
+            }
+        });
+        const resolvedCandidates = await Promise.all(candidatePromises);
+        const filteredCandidates = resolvedCandidates.filter(candidate => candidate !== undefined);
+        return filteredCandidates;
+    } catch (error) {
+        console.error("Error fetching candidates:", error);
+        throw error;
+    }
+}
 
 const PORT = process.env.PORT || 5001;
 app.listen(PORT, () => {

@@ -3,6 +3,8 @@ import Candidatelist from './Candidatelist';
 import AddProfile from './AddProfile';
 import CandidateProfile from './CandidateProfile';
 import { END_POINTS } from './Constants';
+import ATSMatch from './ATSMatch';
+
 export function Router() {
     const { CANDIDATE,
         CANDIDATE_LIST,
@@ -13,6 +15,7 @@ export function Router() {
             <Route path= {CANDIDATE_LIST} element={<Candidatelist />} />
             <Route path={`${CANDIDATE}/:id`} element={<CandidateProfile />} />
             <Route path={ADD_PROFILE} element={<AddProfile />} />
+            <Route path='/atsMatch' element={<ATSMatch />} />
         </Routes>
 
     )
