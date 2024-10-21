@@ -35,7 +35,6 @@ function App() {
     onSuccess: (response) => {
       localStorage.setItem('authToken', response.access_token);
       const expiryTime = new Date().getTime() + response.expires_in * 1000;
-      console.log(expiryTime)
       setTokenExpiryTime(expiryTime);
       fetchUserProfileFromToken(response.access_token)
     },

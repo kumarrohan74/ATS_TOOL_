@@ -23,7 +23,6 @@ function AddProfile() {
       formData.append("application_status", "Profile Added");
     formData.append("resume", resume);
     formData.append("applied_position", applied_position);
-    
     if (isJDChecked) {
       formData.append("jobDescription", jobDescription);
     }
@@ -33,18 +32,17 @@ function AddProfile() {
           'Content-Type': 'multipart/form-data',
         },
       });
-      setIsOpen(true);
       if (isJDChecked) {
         setScore(Math.round(response.data.atsScore));
       }
-
-      setCandidateId(response.data.id);
-
+      setCandidateId(response.data._id);
+      setIsOpen(true);
     } catch (error) {
       console.error(ALERTS.ERROR_UPLOAD, error);
     }
   };
   const closeModal = () => setIsOpen(false)
+
   return (
     <>
       {isOpen && <UploadModal value={{ isOpen, closeModal, score, candidateId, isJDChecked }} />}

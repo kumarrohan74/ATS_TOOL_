@@ -3,51 +3,9 @@ import axios from "axios";
 import { Button, TextField } from "@mui/material";
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import UploadModal from "./Modal";
-import ToggleSwitch from "./common/Checkbox";
 import { CandidateContext } from "./Context";
 import DataTable from "./Datagrid";
-import { COLUMNS } from './Constants';
-
-const columns = [
-    { field: 'id', headerName: 'ID', width: 90 },
-    {
-        field: 'name',
-        headerName: 'Full Name',
-        width: 160,
-    },
-    {
-        field: 'email',
-        headerName: 'Email',
-        sortable: false,
-        width: 160,
-    },
-    {
-        field: 'applied_position',
-        headerName: 'Applied Position',
-        width: 150,
-    },
-    {
-        field: 'ats_score',
-        headerName: 'ATS Score',
-    },
-    {
-        field: 'location',
-        headerName: 'Location',
-        width: 140,
-    },
-    {
-        field: 'status',
-        headerName: 'Application Status',
-        width: 160,
-    },
-    {
-        field: 'experience',
-        headerName: 'Experience',
-        type: 'number',
-        width: 120,
-    },
-];
-
+import { COLUMNS, END_POINTS } from './Constants';
 
 function ATSMatch() {
 
@@ -60,7 +18,7 @@ function ATSMatch() {
     const [filteredRows, setFilteredRows] = useState([]);
     const { isJDChecked } = React.useContext(CandidateContext);
     const apiURI = process.env.REACT_APP_API_URL;
-    const endpoint = '/getCandidatesByScore';
+    const endpoint = END_POINTS.GET_CANDIDATES_BY_SCORE;
 
     useEffect(() => {
         if (data[0]) {
@@ -93,6 +51,12 @@ function ATSMatch() {
     };
 
     const closeModal = () => setIsOpen(false)
+
+    const updatedColumns = [
+        ...COLUMNS,
+        { field: 'ats_score', headerName: 'ATS Score', width: 90 }
+    ];
+
     return (
         <>
             {isOpen && <UploadModal value={{ isOpen, closeModal, score, candidateId, isJDChecked }} />}
@@ -108,7 +72,6 @@ function ATSMatch() {
                             </label>
                         </div>
                         <textarea
-                            // id="textarea"
                             value={jobDescription}
                             onChange={(e) => setJobDescription(e.target.value)}
                             className={`border border-gray-300 mt-2 rounded-lg w-11/12  pl-2
@@ -143,7 +106,7 @@ function ATSMatch() {
                     <div className="w-full">
                         <p className="text-2xl py-2 mx-10 font-bold">Matched Candidates</p>
                         <div className="w-11/12 mx-10 shadow-lg p-8" style={{ boxShadow: "0px 4px 6px rgba(128, 128, 128, 0.5)" }}>
-                            <DataTable columns={COLUMNS} rows={filteredRows} loader={loader} />
+                            <DataTable columns={updatedColumns} rows={filteredRows} loader={loader} />
                         </div>
                     </div>
                 )}

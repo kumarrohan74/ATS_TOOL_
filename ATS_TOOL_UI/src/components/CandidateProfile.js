@@ -11,6 +11,7 @@ import Dropdown from './Dropdown';
 import { Button } from '@mui/material';
 import { CandidateContext } from './Context';
 import axios from 'axios';
+
 export default function CandidateProfile() {
   const { application_status } = useContext(CandidateContext)
   const [isClose, setIsClose] = useState(true);
@@ -44,6 +45,27 @@ export default function CandidateProfile() {
     }
     setIsClose(true);
   }
+
+
+  const downloadFile = async () => {
+    try {
+      const response = await fetch(`${API_URI}/download/${list._id}`);
+      if (!response.ok) {
+        throw new Error('Failed to download resume');
+      }
+      const blob = await response.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = resume.resumeName;
+      document.body.appendChild(a);
+      a.click();
+      a.remove();
+      window.URL.revokeObjectURL(url);
+    } catch (error) {
+      console.error("Error downloading the resume:", error);
+    }
+  }
   return (<>
     <div className="bg-slate-50 w-screen min-h-screen p-6">
       <div className="flex flex-wrap w-full">
@@ -64,9 +86,9 @@ export default function CandidateProfile() {
             <p className="text-gray-600 text-lg"><strong><MailIcon /></strong> {list?.email}</p>
             <p className="text-gray-600 text-lg"><strong><LocalPhoneIcon /></strong> {list?.phone_number}</p>
             <p className="text-gray-600 text-lg"><strong><LocationOnIcon /></strong> {list?.location}</p>
-            <p className="text-gray-600 text-lg"><strong><PictureAsPdfIcon /><a className="text-blue-600 text-underline" href={`data:application/pdf;base64,${resume?.resumeBuffer}`} download={resume?.resumeName}>
+            <p className="text-gray-600 text-lg"><strong><PictureAsPdfIcon /><p className="text-blue-600 text-underline" onClick={downloadFile}>
               {resume?.resumeName}
-            </a></strong> </p>
+            </p></strong> </p>
           </div>
         </div>
       </div>

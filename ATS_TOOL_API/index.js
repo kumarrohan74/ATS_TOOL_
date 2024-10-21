@@ -1,20 +1,18 @@
 const express = require('express');
 const cors = require('cors');
-const path = require('path');
-const fs = require('fs');
 const bodyParser = require('body-parser');
 const multer = require("multer");
 const pdfParse = require("pdf-parse");
 require('dotenv').config();
-const { connectDB, getDB } = require('./db');
+const { connectDB } = require('./db');
+const Candidate = require('./models/candidate');
 const { compareText, extractCurrentOrganization, extractEmail, extractExperience, extractLocation,
     extractName, extractPhone, extractSkills, extractCandidateDescription } = require("./utils/textMatch");
-
-const { ObjectId } = require("mongodb");
 const { serverConsts, STATUS_CODES, mongoDBConsts, messages, END_POINTS, DATABASE_LISTS } = require('./Constants')
-let objID;
 
 const app = express();
+
+connectDB();
 
 app.use(cors());
 app.use(bodyParser.json());
@@ -27,18 +25,9 @@ app.use(function (req, res, next) {
     next();
 });
 
-const { CANDIDATES_DB } = DATABASE_LISTS;
-
-connectDB().then(() => {
-    console.log(mongoDBConsts.mongodb_connection_established);
-}).catch((error) => {
-    console.error(mongoDBConsts.failed_to_connect_to_mongodb, error);
-});
-
 app.get('/api-health', async (req, res) => {
     res.json({ health: 'ok' });
 });
-
 
 app.get(END_POINTS.GET_CANDIDATES, async (req, res) => {
     const candidates = await fetchCandidates("true");
@@ -57,7 +46,7 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.single("resume"), async (req, res) => 
     try {
         const resumeData = await pdfParse(resumeBuffer);
         const resumeText = resumeData.text;
-        const extractedData = {
+        const newCandidate = new Candidate({
             name: extractName(resumeText),
             email: extractEmail(resumeText),
             phone_number: extractPhone(resumeText),
@@ -70,18 +59,14 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.single("resume"), async (req, res) => 
             applied_position,
             status: application_status,
             resume: { resumeName, resumeBuffer, resumeText }
-        };
-        console.log(extractedData)
+        })
         if (jobDescription !== null) {
-          res.status(201).json({ atsScore: Number(extractedData.ats_score), message: 'ATS score successfully generated' })
-      }
-      else {
-        console.log('here')
-          const ats_db = await connectDB();
-          const collection = await ats_db.collection(CANDIDATES_DB);
-          const result = await collection.insertOne(extractedData);
-          res.status(201).json({ atsScore: Number(extractedData.ats_score), message: 'Data added', id: result.insertedId.toString() })
-      }
+            res.status(201).json({ atsScore: newCandidate.ats_score, message: 'ATS score successfully generated' })
+        }
+        else {
+            const savedCandidate = await newCandidate.save();
+            res.status(201).json(savedCandidate);
+        }
     } catch (error) {
         res.status(STATUS_CODES.SERVER_ERROR).send(serverConsts.error_parsing_resume);
     }
@@ -94,24 +79,30 @@ app.get(END_POINTS.CANDIDATE_ID, async (req, res) => {
 
 app.patch(END_POINTS.CANDIDATE_ID, async (req, res) => {
     const { status, id } = req.body;
-    console.log(status, new ObjectId(id))
-    const ats_db = await connectDB();
-    const collection = await ats_db.collection(CANDIDATES_DB);
-    const result = await collection.findOneAndUpdate({ _id: new ObjectId(id) }, { $set: { status: status } }, { returnDocument: 'after' });
-    const updatedResponse = await collection.findOne({_id: new ObjectId(id)})
-    res.json({ status: result.status, message: "Status updated", updatedData: updatedResponse });
+    try {
+        const updatedCandidate = await Candidate.findByIdAndUpdate(
+            id,
+            { $set: { status: status } },
+            { new: true }
+        );
+        if (!updatedCandidate) {
+            return res.status(404).json({ message: "Candidate not found" });
+        }
+        res.json({ status: updatedCandidate.status, message: "Status updated", updatedData: updatedCandidate });
+    } catch (error) {
+        console.error(error);
+        res.status(500).json({ message: "Error updating candidate status" });
+    }
 });
 
 async function fetchCandidates(value) {
     try {
-        const db = getDB();
-        const candidatesCollection = db.collection(CANDIDATES_DB);
-        let candidates
+        let candidates;
         if (value === "true") {
-            candidates = await candidatesCollection.find({}, { projection: { skills: 0, education: 0, date_applied: 0, category: 0, id: 0, comments: 0, resume_url: 0 } }).sort({ _id: -1 }).toArray();
+            candidates = candidates = await Candidate.find().select('name email location applied_position status experience').sort({ date_applied: -1 });
         }
         else {
-            candidates = await candidatesCollection.findOne({ _id: new ObjectId(value) });
+            candidates = await Candidate.findById(value)
         }
         return candidates;
     } catch (error) {
@@ -120,12 +111,31 @@ async function fetchCandidates(value) {
     }
 }
 
-app.get('/candidate/:id', async (req, res) => {
+app.get(END_POINTS.CANDIDATE_ID, async (req, res) => {
     const candidate = await fetchCandidates(req.params.id);
     res.json(candidate)
 });
 
-app.post('/getCandidatesByScore', async (req, res) => {
+app.get(END_POINTS.DOWNLOAD_RESUME, async (req, res) => {
+    const { id } = req.params;
+
+    try {
+        const candidate = await Candidate.findById(id);
+        if (!candidate || !candidate.resume) {
+            return res.status(404).json({ message: 'Resume not found' });
+        }
+        res.set({
+            'Content-Type': 'application/pdf',
+            'Content-Disposition': `attachment; filename=${candidate.resume.resumeName}`,
+        });
+        res.send(candidate.resume.resumeBuffer);
+    } catch (error) {
+        console.error("Error downloading resume:", error);
+        res.status(500).json({ message: 'Internal server error' });
+    }
+});
+
+app.post(END_POINTS.GET_CANDIDATES_BY_SCORE, async (req, res) => {
     const selectedCandidates = [];
     const response = await fetchCandidatesByScore(req.body.jobDescription, req.body.score)
     selectedCandidates.push(response)
@@ -140,26 +150,22 @@ const generateScoreByResume = (resumeText, jobDescription) => {
 
 async function fetchCandidatesByScore(jobDescription, atsScore) {
     try {
-        const ats_db = await connectDB();
-        const collection = await ats_db.collection(CANDIDATES_DB);
-        const result = await collection.find({}).toArray();
-        const candidatePromises = result.map(async (candidate) => {
+        const candidates = await Candidate.find({});
+        const candidatePromises = candidates.map(async (candidate) => {
             const atsGeneratedScore = generateScoreByResume(candidate.resume.resumeText, jobDescription);
+
             if (atsGeneratedScore >= atsScore) {
-                const updatedScore = await collection.updateOne(
-                    { _id: candidate._id },
-                    { $set: { ats_score: atsGeneratedScore } }
-                );
-                const selectedCandidate = await collection.find(
-                    { _id: candidate._id },
-                    { projection: { resume: 0 } }
-                ).toArray();
-                return selectedCandidate[0];
+                candidate.ats_score = atsGeneratedScore;
+                await candidate.save();
+                const { resume, ...selectedCandidate } = candidate.toObject();
+                return selectedCandidate;
             }
         });
+
         const resolvedCandidates = await Promise.all(candidatePromises);
         const filteredCandidates = resolvedCandidates.filter(candidate => candidate !== undefined);
         return filteredCandidates;
+
     } catch (error) {
         console.error("Error fetching candidates:", error);
         throw error;

@@ -15,6 +15,8 @@ const END_POINTS = {
     GET_CANDIDATES: "/get-candidates",
     RESUME_UPLOAD: "/resume-upload",
     CANDIDATE_ID: "/candidate/:id",
+    DOWNLOAD_RESUME: "/download/:id",
+    GET_CANDIDATES_BY_SCORE: "/getCandidatesByScore",
 };
 const mongoDBConsts = {
     mongodb_connected: "MongoDB Connected",
