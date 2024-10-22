@@ -5,7 +5,7 @@ const END_POINTS = {
     CANDIDATE_LIST: "/candidatelist",
     ADD_PROFILE: "/addprofile",
     UPLOAD_RESUME: "/resume-upload",
-    GET_CANDIDATES_BY_SCORE: "/getCandidatesByScore",
+    GET_CANDIDATES_BY_SCORE: "/getCandidatesByScore"
 };
 const ALERTS = {
     UPLOAD_RESUME_ERROR: "Please upload resume file",

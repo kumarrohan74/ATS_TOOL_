@@ -2,6 +2,8 @@ import React, { useState } from "react";
 import axios from "axios";
 import Button from '@mui/material/Button';
 import CloudUploadIcon from '@mui/icons-material/CloudUpload';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
 import Dropdown from "./Dropdown";
 import ToggleSwitch from "./common/Checkbox";
 import { CandidateContext } from "./Context";
@@ -14,13 +16,19 @@ function AddProfile() {
   const [resume, setResume] = useState(null);
   const [jobDescription, setJobDescription] = useState('');
   const [score, setScore] = useState(0);
-  const [candidateId, setCandidateId] = useState('')
-  const { isJDChecked, applied_position,application_status } = React.useContext(CandidateContext);
+  const [candidateId, setCandidateId] = useState('');
+  const [openLoader, setOpenLoader] = React.useState(false);
+  const { isJDChecked, applied_position, application_status } = React.useContext(CandidateContext);
+
+  const handleCloseLoader = () => {
+    setOpenLoader(false);
+  };
 
   const handleSubmit = async (e) => {
+    setOpenLoader(true);
     e.preventDefault();
     const formData = new FormData();
-      formData.append("application_status", "Profile Added");
+    formData.append("application_status", "Profile Added");
     formData.append("resume", resume);
     formData.append("applied_position", applied_position);
     if (isJDChecked) {
@@ -36,6 +44,7 @@ function AddProfile() {
         setScore(Math.round(response.data.atsScore));
       }
       setCandidateId(response.data._id);
+      setOpenLoader(false);
       setIsOpen(true);
     } catch (error) {
       console.error(ALERTS.ERROR_UPLOAD, error);
@@ -46,7 +55,14 @@ function AddProfile() {
   return (
     <>
       {isOpen && <UploadModal value={{ isOpen, closeModal, score, candidateId, isJDChecked }} />}
-      <form onSubmit={handleSubmit} className="w-full">
+      <Backdrop
+        sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+        open={openLoader}
+        onClick={handleCloseLoader}
+      >
+        <CircularProgress color="inherit" />
+      </Backdrop>
+      <form onSubmit={handleSubmit} className="w-11/12">
         <div className="w-full h-screen mt-4">
           <div className="w-full ml-10">
             <div className="flex justify-between w-11/12">
@@ -90,7 +106,7 @@ function AddProfile() {
           </div>
           <div className="w-11/12 flex justify-end ml-10">
             <div className="mr-4">
-              <Dropdown dropdown="addProfile" disabled={isJDChecked ? true : false}/>
+              <Dropdown dropdown="addProfile" disabled={isJDChecked ? true : false} />
             </div>
             <Button
               type="submit"
@@ -105,7 +121,7 @@ function AddProfile() {
               startIcon={<CloudUploadIcon />}
               disabled={!resume ? true : false}
             >
-             {isJDChecked ? `Check ATS Score` : `Upload`}
+              {isJDChecked ? `Check ATS Score` : `Upload`}
             </Button>
           </div>
         </div>
