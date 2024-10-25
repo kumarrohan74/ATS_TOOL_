@@ -15,12 +15,11 @@ function AddProfile() {
   const [jobDescription, setJobDescription] = useState('');
   const [score, setScore] = useState(0);
   const [candidateId, setCandidateId] = useState('')
-  const { isJDChecked, applied_position,application_status } = React.useContext(CandidateContext);
+  const { isJDChecked, applied_position, application_status } = React.useContext(CandidateContext);
 
   const handleSubmit = async (e) => {
     e.preventDefault();
     const formData = new FormData();
-      formData.append("application_status", "Profile Added");
     formData.append("resume", resume);
     formData.append("applied_position", applied_position);
     if (isJDChecked) {
@@ -90,7 +89,7 @@ function AddProfile() {
           </div>
           <div className="w-11/12 flex justify-end ml-10">
             <div className="mr-4">
-              <Dropdown dropdown="addProfile" disabled={isJDChecked ? true : false}/>
+              <Dropdown dropdown="addProfile" disabled={isJDChecked ? true : false} />
             </div>
             <Button
               type="submit"
@@ -105,7 +104,7 @@ function AddProfile() {
               startIcon={<CloudUploadIcon />}
               disabled={!resume ? true : false}
             >
-             {isJDChecked ? `Check ATS Score` : `Upload`}
+              {isJDChecked ? `Check ATS Score` : `Upload`}
             </Button>
           </div>
         </div>

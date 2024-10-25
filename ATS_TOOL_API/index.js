@@ -58,7 +58,8 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.single("resume"), async (req, res) => 
             candidateDescription: extractCandidateDescription(resumeText),
             applied_position,
             status: application_status,
-            resume: { resumeName, resumeBuffer, resumeText }
+            resume: { resumeName, resumeBuffer, resumeText },
+            remarks: "no remarks yet"
         })
         if (jobDescription !== null) {
             res.status(201).json({ atsScore: newCandidate.ats_score, message: 'ATS score successfully generated' })
@@ -77,18 +78,21 @@ app.get(END_POINTS.CANDIDATE_ID, async (req, res) => {
     res.status(STATUS_CODES.SUCCESS).json(candidate);
 });
 
-app.patch(END_POINTS.CANDIDATE_ID, async (req, res) => {
-    const { status, id } = req.body;
+app.patch(`${END_POINTS.CANDIDATE_ID}`, async (req, res) => {
+    const { id } = req.body;
+    const key = req.query.key;
+    const value = req.query.value;
     try {
         const updatedCandidate = await Candidate.findByIdAndUpdate(
             id,
-            { $set: { status: status } },
+            { $set: { [key]: value } },
             { new: true }
         );
         if (!updatedCandidate) {
             return res.status(404).json({ message: "Candidate not found" });
         }
-        res.json({ status: updatedCandidate.status, message: "Status updated", updatedData: updatedCandidate });
+
+        res.json({ [key]: updatedCandidate[key], message: `${req.query.key} updated`, updatedData: updatedCandidate });
     } catch (error) {
         console.error(error);
         res.status(500).json({ message: "Error updating candidate status" });

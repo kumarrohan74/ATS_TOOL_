@@ -1,5 +1,5 @@
-import { useContext, useState } from 'react';
-import { useLocation } from "react-router-dom";
+import { useContext, useEffect, useRef, useState } from 'react';
+import { useLocation, useNavigate } from "react-router-dom";
 import ATSScoreCard from "./ATSScoreCard";
 import MailIcon from '@mui/icons-material/Mail';
 import LocalPhoneIcon from '@mui/icons-material/LocalPhone';
@@ -13,43 +13,93 @@ import { CandidateContext } from './Context';
 import axios from 'axios';
 
 export default function CandidateProfile() {
-  const { application_status } = useContext(CandidateContext)
-  const [isClose, setIsClose] = useState(true);
-  const [loader, setLoader] = useState(false);
+  const { application_status, applied_position, isEditRemarksOpen, setIsEditRemarksOpen } = useContext(CandidateContext);
+  const [isStatusClose, setIsStatusClose] = useState(true);
+  const [statusLoader, setStatusLoader] = useState(false);
+  const [roleLoader, setRoleLoader] = useState(false);
+  const [remarksLoader, setRemarksLoader] = useState(false);
   const location = useLocation();
-  const list = location.state?.candidate;
-  const skills = list?.skills || [];
-  const [status, setStatus] = useState(list?.status)
-  const [resume, setResume] = useState(list?.resume);
-  const handleClose = () => {
-    setIsClose(false);
+  const navigate = useNavigate();
+  const data = location.state.candidate;
+  const [candidate, setCandidate] = useState(data);
+  const [isRoleClose, setIsRoleClose] = useState(true)
+  const skills = candidate?.skills || [];
+  const [status, setStatus] = useState(candidate?.status);
+  const [role, setRole] = useState(candidate?.applied_position);
+  const [isRemarksOpen, setIsRemarksOpen] = useState('');
+  const [resume, setResume] = useState(candidate?.resume);
+  const [formValue, setFormValue] = useState(candidate.remarks || '');
+  const handleClose = (e) => {
+    if (e.target.id === "changeStatus") {
+      console.log(e.target.value)
+      setIsStatusClose(false);
+    }
+    if (e.target.id === "changeRole") {
+      setIsRoleClose(false);
+    }
   }
-  const handleStatusClick = async () => {
-    setLoader(true);
+
+  const handleStatusClick = async (e) => {
+
+    e.stopPropagation();
+    e.preventDefault();
+    const actions = {
+      changeStatus: { key: 'status', value: application_status },
+      changeRole: { key: 'applied_position', value: applied_position },
+      remarks: { key: 'remarks', value: formValue }
+    };
+    const action = actions[e.target.id];
+    const { key, value } = action;
+
+    if (key === "status") setStatusLoader(true)
+    if (key === "applied_position") setRoleLoader(true)
+    if (key === "remarks") setRemarksLoader(true);
     try {
-      axios.patch(`${API_URI}${END_POINTS.CANDIDATE}/${list._id}`, {
-        status: application_status,
-        id: list._id
-      },
+      axios.patch(`${API_URI}${END_POINTS.CANDIDATE}/${candidate._id}/?key=${key}&value=${value}`,
+        {
+          id: candidate._id
+        },
         {
           headers: {
+            'Accept': 'application/json',
             'Content-Type': 'application/json',
           },
-        }).then(result => {
-          setStatus(result.data.status)
-          setLoader(false)
-        })
+          body: JSON.stringify({ key, value })
+        }).then(response => {
+          if (e.target.id === 'changeStatus') {
+            setStatus(response.data.status);
+            setStatusLoader(false)
+
+          }
+          if (e.target.id === 'changeRole') {
+            setRole(response.data.applied_position);
+            setRoleLoader(false)
+          }
+          if (e.target.id === "remarks") {
+            setIsEditRemarksOpen(false);
+            setRemarksLoader(false)
+          }
+          navigate(`${END_POINTS.CANDIDATE}/${response.data.updatedData._id}`, { state: { candidate: response.data.updatedData } });
+
+        });
     }
     catch (e) {
       console.log('error edit', e);
     }
-    setIsClose(true);
-  }
+    if (e.target.id === "changeStatus") {
+      setIsStatusClose(true);
+      return;
+    }
+    if (e.target.id === "changeRole") {
+      setIsRoleClose(true);
+      return;
+    }
 
+  }
 
   const downloadFile = async () => {
     try {
-      const response = await fetch(`${API_URI}/download/${list._id}`);
+      const response = await fetch(`${API_URI}/download/${candidate._id}`);
       if (!response.ok) {
         throw new Error('Failed to download resume');
       }
@@ -66,6 +116,11 @@ export default function CandidateProfile() {
       console.error("Error downloading the resume:", error);
     }
   }
+  const handleCancelRemarks = () => {
+    setFormValue(candidate.remarks);
+    setIsEditRemarksOpen(false)
+  }
+
   return (<>
     <div className="bg-slate-50 w-screen min-h-screen p-6">
       <div className="flex flex-wrap w-full">
@@ -74,21 +129,23 @@ export default function CandidateProfile() {
             <img className="w-32 h-32 rounded-full object-cover" src="https://via.placeholder.com/150" alt="Candidate Photo" />
           </div>
           <div className="ml-6">
-            <h2 className="font-bold text-2xl">{list?.name}</h2>
-            <p className="text-gray-700 text-lg">{list?.category}</p>
+            <h2 className="font-bold text-2xl">{candidate?.name}</h2>
+            <p className="text-gray-700 text-lg">{candidate?.category}</p>
             <p className="text-gray-500 text-base">ABC Company Pvt.Ltd.</p>
-            <p className="text-gray-500 text-base">{list?.education}</p>
+            <p className="text-gray-500 text-base">{candidate?.education}</p>
+            <p className="text-gray-500 text-base">Exp: {candidate?.experience.totalYears}+ years</p>
+
           </div>
           <div className="ml-14">
-            <ATSScoreCard score={list?.ats_score} />
+            <ATSScoreCard score={candidate?.ats_score} />
           </div>
           <div className="ml-auto">
-            <p className="text-gray-600 text-lg"><strong><MailIcon /></strong> {list?.email}</p>
-            <p className="text-gray-600 text-lg"><strong><LocalPhoneIcon /></strong> {list?.phone_number}</p>
-            <p className="text-gray-600 text-lg"><strong><LocationOnIcon /></strong> {list?.location}</p>
-            <p className="text-gray-600 text-lg"><strong><PictureAsPdfIcon /><p className="text-blue-600 text-underline" onClick={downloadFile}>
-              {resume?.resumeName}
-            </p></strong> </p>
+            <p className="text-gray-600 text-lg"><strong><MailIcon /></strong> {candidate?.email}</p>
+            <p className="text-gray-600 text-lg"><strong><LocalPhoneIcon /></strong> {candidate?.phone_number}</p>
+            <p className="text-gray-600 text-lg"><strong><LocationOnIcon /></strong> {candidate?.location}</p>
+            <p className="text-gray-600 text-lg"><strong><PictureAsPdfIcon /><a className="text-blue-600 text-underline" href={`data:application/pdf;base64,${resume?.resumeBuffer}`} download={resume?.resumeName} onClick={downloadFile} />
+              {resume?.resumeName}</strong>
+            </p>
           </div>
         </div>
       </div>
@@ -106,11 +163,16 @@ export default function CandidateProfile() {
           </div>
           <div className="bg-white rounded-lg shadow-lg p-6 min-h-auto w-auto flex items-center justify-center">
             <div className="text-center">
-              <h3 className="text-lg font-bold mb-4 text-indigo-800">Role:<span className='text-md font-bold text-indigo-700'> {list?.applied_position}</span></h3>
-              <h3 className="text-lg font-bold mb-4 text-indigo-800">Status:<span className='text-md font-bold text-indigo-700'> {loader ? <CircularLoader size={1} thickness={1} /> : status}</span></h3>
-              {isClose ? <Button variant='outlined' onClick={handleClose}>Edit status</Button>
-                : <div className='flex justify-around w-auto'><Dropdown dropdown="applicantStatus" /><Button variant='contained' className='w-auto' onClick={handleStatusClick}>save</Button></div>
-              }
+              <h3 className="text-lg font-bold mb-4 text-indigo-800">Role:<span className='text-md font-bold text-indigo-700'> {roleLoader ? <CircularLoader size={1} thickness={1} /> : role}</span></h3>
+              <h3 className="text-lg font-bold mb-4 text-indigo-800">Status:<span className='text-md font-bold text-indigo-700'> {statusLoader ? <CircularLoader size={1} thickness={1} /> : status}</span></h3>
+              <div className="flex justify-center item-center "> <div className="mr-1" hidden={!isRoleClose ? true : false}>{isStatusClose ? <Button value='changeStatus' variant='outlined' onClick={handleClose} id='changeStatus'>Edit status</Button>
+                : <div className='flex justify-around w-auto'><Dropdown dropdown="applicantStatus" /><Button variant='contained' className='w-auto' onClick={handleStatusClick} value='changeStatus' id="changeStatus">save</Button></div>
+              }</div>
+                <div className="mr-1" hidden={!isStatusClose ? true : false}>{isRoleClose ? <Button value='changeRole' variant='outlined' onClick={handleClose} id="changeRole">Change Role</Button>
+                  : <div className='flex justify-around w-auto'><Dropdown dropdown="addProfile" /><Button variant='contained' className='w-auto' onClick={handleStatusClick} value='changeRole' id="changeRole">save</Button></div>
+                }</div>
+
+              </div>
             </div>
           </div>
         </div>
@@ -118,8 +180,22 @@ export default function CandidateProfile() {
           <div className="bg-white rounded-lg shadow-lg p-6 min-h-[300px]">
             <h3 className="text-2xl font-bold mb-4 text-indigo-800">Candidate's Description</h3>
             <p className="text-lg text-gray-700">
-              {list?.description || ALERTS.NO_DESCRIPTION}
+              {candidate?.candidateDescription}
             </p>
+          </div>
+          <div className="bg-white rounded-lg shadow-lg mt-2 p-6 h-auto">
+            <h3 className="text-2xl font-bold mb-4 text-indigo-800 item-center">Remarks:</h3>
+            {
+              !candidate.remarks || isEditRemarksOpen
+                ? <form onSubmit={handleStatusClick} className=" w-full min-h-[50px] relative" id="remarks">
+                  <textarea class="bg-gray-200  focus:bg-white p-1 mr-2 rounded w-full " rows={4} type="text" value={formValue} onChange={(e) => setFormValue(e.target.value)} />
+                  <div className='flex justify-end mt-2 space-x-2'> <Button variant="contained" type="submit" className='bg-blue-500 text-white font-bold  rounded'>Save</Button>
+                    <Button variant="text" className='mb-4 font-bold text-red-800 rounded border hover:bg-gray-300 ml-2' onClick={handleCancelRemarks}>Cancel</Button>
+                  </div> </form>
+                : <p class="mr-4 text-md text-gray-500 font-bold">
+                  {formValue} <span className="cursor-pointer text-blue-600 text-sm ml-2 underline" onClick={() => setIsEditRemarksOpen(true)}>edit remarks</span>
+                </p>
+            }
           </div>
         </div>
       </div>
