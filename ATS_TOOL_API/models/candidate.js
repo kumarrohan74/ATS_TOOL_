@@ -40,7 +40,8 @@ const candidateSchema = new mongoose.Schema({
         default: "Profile Added"
     },
     category: { type: String },
-    description: { type: String }
+    description: { type: String },
+    remarks: { type: String, required: false }
 });
 
 const Candidate = mongoose.model('Candidate', candidateSchema, 'candidates_list_updated');

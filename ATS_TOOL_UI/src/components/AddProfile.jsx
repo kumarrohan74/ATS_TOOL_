@@ -23,7 +23,7 @@ function AddProfile() {
   const handleCloseLoader = () => {
     setOpenLoader(false);
   };
-
+  
   const handleSubmit = async (e) => {
     setOpenLoader(true);
     e.preventDefault();
