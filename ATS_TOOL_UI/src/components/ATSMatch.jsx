@@ -2,12 +2,21 @@ import React, { useEffect, useState } from "react";
 import axios from "axios";
 import { Button, TextField } from "@mui/material";
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
+import Backdrop from '@mui/material/Backdrop';
+import CircularProgress from '@mui/material/CircularProgress';
+import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
+import Alert from '@mui/material/Alert';
+import { useNavigate } from 'react-router-dom';
 import UploadModal from "./Modal";
 import { CandidateContext } from "./Context";
 import DataTable from "./Datagrid";
-import { COLUMNS, END_POINTS } from './Constants';
+import { END_POINTS, API_URI, ALERTS } from './Constants';
 
 function ATSMatch() {
+
+    const navigate = useNavigate();
+
+    const { CANDIDATE } = END_POINTS;
 
     const [isOpen, setIsOpen] = useState(false);
     const [jobDescription, setJobDescription] = useState('');
@@ -15,13 +24,86 @@ function ATSMatch() {
     const [candidateId, setCandidateId] = useState('')
     const [data, setData] = useState([]);
     const [loader, setLoader] = useState([]);
+    const [openLoader, setOpenLoader] = useState(false);
     const [filteredRows, setFilteredRows] = useState([]);
+    const [openSnackbar, setOpenSnackbar] = useState(false);
+
+    const handleSnackbarClick = () => {
+        setOpenSnackbar(true);
+    };
+
+    const handleSnackbarClose = (event, reason) => {
+        console.log("clicked")
+        if (reason === 'clickaway') {
+            return;
+        }
+        setOpenSnackbar(false);
+    };
     const { isJDChecked } = React.useContext(CandidateContext);
     const apiURI = process.env.REACT_APP_API_URL;
     const endpoint = END_POINTS.GET_CANDIDATES_BY_SCORE;
 
+    const columns = [
+        { field: 'id', headerName: 'ID', width: 90 },
+        {
+            field: 'name',
+            headerName: 'Full Name',
+            width: 180,
+            renderCell: (params) => (
+                <span style={{ color: 'blue' }} onClick={() => handleSingleProfile(params.row)}>{params.value}</span>
+            ),
+        },
+        {
+            field: 'email',
+            headerName: 'Email',
+            sortable: false,
+            width: 200,
+        },
+        {
+            field: 'applied_position',
+            headerName: 'Role',
+            width: 200,
+        },
+        {
+            field: 'status',
+            headerName: 'Application Status',
+            width: 180,
+        },
+        {
+            field: 'experience',
+            headerName: 'Experience(years)',
+            type: 'number',
+            width: 160,
+        },
+        {
+            field: 'location',
+            headerName: 'Location',
+            width: 200,
+        },
+    ];
+
+    const handleSingleProfile = async (e) => {
+        setOpenLoader(true);
+        fetch(`${API_URI}${CANDIDATE}/${e.id}`)
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error(`${ALERTS.HTTP_ERROR} : ${res.status}`);
+                }
+                return res.json();
+            })
+            .then((data) => {
+                setOpenLoader(false);
+                navigate(`${CANDIDATE}/${e.id}`, { state: { candidate: data } });
+            })
+            .catch((err) => console.error(err))
+    }
+
     useEffect(() => {
         if (data[0]) {
+            if (!data[0]?.length) {
+                console.log('also here')
+                handleSnackbarClick();
+              }
             const rows = data[0].map((details) => {
                 return {
                     id: details?._id, name: details?.name, email: details?.email, ats_score: Math.round(details?.ats_score), applied_position: details?.applied_position,
@@ -31,9 +113,15 @@ function ATSMatch() {
             setFilteredRows(rows);
             setLoader(false)
         }
-    }, [data])
+       
+    }, [data]);
+
+    const handleCloseLoader = () => {
+        setOpenLoader(false);
+    };
 
     const handleSubmit = async (e) => {
+        setOpenLoader(true);
         e.preventDefault();
         const payload = {
             jobDescription, score
@@ -45,6 +133,7 @@ function ATSMatch() {
                 },
             });
             setData(response.data.response)
+            setOpenLoader(false);
         } catch (error) {
             console.error("Error uploading files:", error);
         }
@@ -53,14 +142,31 @@ function ATSMatch() {
     const closeModal = () => setIsOpen(false)
 
     const updatedColumns = [
-        ...COLUMNS,
+        ...columns,
         { field: 'ats_score', headerName: 'ATS Score', width: 90 }
     ];
 
     return (
         <>
             {isOpen && <UploadModal value={{ isOpen, closeModal, score, candidateId, isJDChecked }} />}
-            <form onSubmit={handleSubmit} className="w-full">
+            <Backdrop
+                sx={(theme) => ({ color: '#fff', zIndex: theme.zIndex.drawer + 1 })}
+                open={openLoader}
+                onClick={handleCloseLoader}
+            >
+                <CircularProgress color="inherit" />
+            </Backdrop>
+            <Snackbar open={openSnackbar} autoHideDuration={2000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'top', horizontal: 'right' }}>
+                <Alert
+                    onClose={handleSnackbarClose}
+                    severity="error"
+                    variant="filled"
+                    sx={{ width: '100%' }}
+                >
+                   No Candidates found
+                </Alert>
+            </Snackbar>
+            <form onSubmit={handleSubmit} className="w-5/6">
                 <div className="w-full mt-4">
                     <div className="w-full ml-10">
                         <div className="flex justify-between w-11/12">
@@ -102,13 +208,15 @@ function ATSMatch() {
                         </Button>
                     </div>
                 </div>
-                {data[0] && data[0].length && (
-                    <div className="w-full">
+                {data[0]?.length ? (
+                    <div>
                         <p className="text-2xl py-2 mx-10 font-bold">Matched Candidates</p>
-                        <div className="w-11/12 mx-10 shadow-lg p-8" style={{ boxShadow: "0px 4px 6px rgba(128, 128, 128, 0.5)" }}>
+                        <div className="w-11/12 mx-10 shadow-lg p-8 shadow-md">
                             <DataTable columns={updatedColumns} rows={filteredRows} loader={loader} />
                         </div>
                     </div>
+                ) : (
+                   null
                 )}
             </form>
         </>)

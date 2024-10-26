@@ -47,7 +47,7 @@ function DataTable(props) {
                 />
             </Box>
             <Box className="w-11/12" sx={{ minHeight: '20%', height: 'auto' }}>
-                <DataGrid style={{ paddingLeft: '.1%', minHeight: '300px' }}
+                <DataGrid
                     rows={filteredRows}
                     columns={columns}
                     initialState={{
@@ -58,10 +58,7 @@ function DataTable(props) {
                         },
                     }}
                     pageSizeOptions={[10]}
-                    // checkboxSelection
-                    disableRowSelectionOnClick
                     loading={loader}
-                    onRowClick={handleSingleProfile}
                     className='cursor-pointer'
                 />
             </Box>
