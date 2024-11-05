@@ -7,7 +7,8 @@ export const DataProvider = ({ children }) => {
     const [applied_position, setApplied_position] = useState('');
     const [application_status, setApplication_status] = useState('');
     const [formValue, setFormValue] = useState('');
-    const [isEditRemarksOpen, setIsEditRemarksOpen] = useState(false)
+    const [isEditRemarksOpen, setIsEditRemarksOpen] = useState(false);
+    const [isMultipleResumeUpload,setIsMultipleResumeUpload] = useState(true);
     const [positions, setPositions] = useState([
         'Software Engineer',
         'DevOps Engineer',
@@ -60,7 +61,7 @@ export const DataProvider = ({ children }) => {
               .catch(err => console.error(err))
       }, [apiURI]);*/
     return (
-        <CandidateContext.Provider value={{ isJDChecked, setIsJDChecked, applied_position, setApplied_position, positions, setPositions, application_status, setApplication_status, applicant_status, setApplicant_status, formValue, setFormValue, isEditRemarksOpen, setIsEditRemarksOpen }}>
+        <CandidateContext.Provider value={{ isJDChecked, setIsJDChecked, applied_position, setApplied_position, positions, setPositions, application_status, setApplication_status, applicant_status, setApplicant_status, formValue, setFormValue, isEditRemarksOpen, setIsEditRemarksOpen, isMultipleResumeUpload, setIsMultipleResumeUpload }}>
             {children}
         </CandidateContext.Provider>)
 }
