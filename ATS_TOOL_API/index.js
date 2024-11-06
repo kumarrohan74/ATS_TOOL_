@@ -39,12 +39,10 @@ const upload = multer({ storage });
 app.post(END_POINTS.RESUME_UPLOAD, upload.array("resume"), async (req, res) => {
     const jobDescription = req.body.jobDescription ? req.body.jobDescription : null;
     const applied_position = req.body.applied_position;
-
     try {
 
         const data_list = [];
         for (let file of req.files) {
-            console.log(file)
             const resumeBuffer = file.buffer;
             const resumeName = file.originalname;
             const resumeData = await pdfParse(resumeBuffer);
@@ -61,18 +59,18 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.array("resume"), async (req, res) => {
                 candidateDescription: extractCandidateDescription(resumeText),
                 applied_position,
                 resume: { resumeName, resumeBuffer, resumeText },
-                remarks: "no remarks yet"
+                remarks: "NO Remarks Added"
             })
             data_list.push(newCandidate);
         }
 
         if (jobDescription !== null && req.files.length === 1) {
             res.status(201).json({ atsScore: data_list[0].ats_score, message: 'ATS score successfully generated' })
-        }else{
+        } else {
             const savedCandidate = await Candidate.insertMany(data_list);
             res.status(201).json(savedCandidate);
         }
-       
+
 
     } catch (error) {
         res.status(STATUS_CODES.SERVER_ERROR).send(serverConsts.error_parsing_resume);
@@ -128,7 +126,6 @@ app.get(END_POINTS.CANDIDATE_ID, async (req, res) => {
 
 app.get(END_POINTS.DOWNLOAD_RESUME, async (req, res) => {
     const { id } = req.params;
-
     try {
         const candidate = await Candidate.findById(id);
         if (!candidate || !candidate.resume) {

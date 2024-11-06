@@ -96,6 +96,14 @@ export default function CandidateProfile() {
     }
 
   }
+  const handleDropdownClose = (e) => {
+    if (e.target.id === "changeRole") {
+      setIsRoleClose(true)
+    }
+    if (e.target.id === "changeStatus") {
+      setIsStatusClose(true)
+    }
+  }
 
   const downloadFile = async () => {
     try {
@@ -137,7 +145,7 @@ export default function CandidateProfile() {
 
           </div>
           <div className="ml-14">
-            <ATSScoreCard score={candidate?.ats_score} />
+            {  /*<ATSScoreCard score={candidate?.ats_score} />*/}
           </div>
           <div className="ml-auto">
             <p className="text-gray-600 text-lg"><strong><MailIcon /></strong> {candidate?.email}</p>
@@ -161,20 +169,61 @@ export default function CandidateProfile() {
               ))}
             </div>
           </div>
-          <div className="bg-white rounded-lg shadow-lg p-6 min-h-auto w-auto flex items-center justify-center">
+          <div className="bg-white rounded-lg shadow-lg p-6 flex items-center justify-center w-full max-w-md">
             <div className="text-center">
-              <h3 className="text-lg font-bold mb-4 text-indigo-800">Role:<span className='text-md font-bold text-indigo-700'> {roleLoader ? <CircularLoader size={1} thickness={1} /> : role}</span></h3>
-              <h3 className="text-lg font-bold mb-4 text-indigo-800">Status:<span className='text-md font-bold text-indigo-700'> {statusLoader ? <CircularLoader size={1} thickness={1} /> : status}</span></h3>
-              <div className="flex justify-center item-center "> <div className="mr-1" hidden={!isRoleClose ? true : false}>{isStatusClose ? <Button value='changeStatus' variant='outlined' onClick={handleClose} id='changeStatus'>Edit status</Button>
-                : <div className='flex justify-around w-auto'><Dropdown dropdown="applicantStatus" /><Button variant='contained' className='w-auto' onClick={handleStatusClick} value='changeStatus' id="changeStatus">save</Button></div>
-              }</div>
-                <div className="mr-1" hidden={!isStatusClose ? true : false}>{isRoleClose ? <Button value='changeRole' variant='outlined' onClick={handleClose} id="changeRole">Change Role</Button>
-                  : <div className='flex justify-around w-auto'><Dropdown dropdown="addProfile" /><Button variant='contained' className='w-auto' onClick={handleStatusClick} value='changeRole' id="changeRole">save</Button></div>
-                }</div>
+              <h3 className="text-lg font-bold mb-4 text-indigo-800">
+                Role:
+                <span className="text-md font-bold text-indigo-700">
+                  {roleLoader ? <CircularLoader size={1} thickness={1} /> : role}
+                </span>
+              </h3>
+              <h3 className="text-lg font-bold mb-4 text-indigo-800">
+                Status:
+                <span className="text-md font-bold text-indigo-700">
+                  {statusLoader ? <CircularLoader size={1} thickness={1} /> : status}
+                </span>
+              </h3>
 
+              <div className="flex justify-center items-center space-x-4">
+                <div hidden={!isRoleClose}>
+                  {isStatusClose ? (
+                    <Button value="changeStatus" variant="outlined" onClick={handleClose} id="changeStatus">
+                      Edit status
+                    </Button>
+                  ) : (
+                    <div className="flex space-x-2">
+                      <Dropdown dropdown="applicantStatus" />
+                      <Button variant="contained" color="primary" className="w-20" onClick={handleStatusClick} value="changeStatus" id="changeStatus">
+                        Save
+                      </Button>
+                      <Button variant="outlined" color="secondary" className="w-20" onClick={handleDropdownClose} id="changeStatus">
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
+                </div>
+
+                <div hidden={!isStatusClose}>
+                  {isRoleClose ? (
+                    <Button value="changeRole" variant="outlined" onClick={handleClose} id="changeRole">
+                      Change Role
+                    </Button>
+                  ) : (
+                    <div className="flex space-x-2">
+                      <Dropdown dropdown="addProfile" />
+                      <Button variant="contained" color="primary" className="w-20" onClick={handleStatusClick} value="changeRole" id="changeRole">
+                        Save
+                      </Button>
+                      <Button variant="outlined" color='secondary' className="w-20" onClick={handleDropdownClose} id="changeRole">
+                        Cancel
+                      </Button>
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
           </div>
+
         </div>
         <div className="w-2/3 px-2">
           <div className="bg-white rounded-lg shadow-lg p-6 min-h-[300px]">

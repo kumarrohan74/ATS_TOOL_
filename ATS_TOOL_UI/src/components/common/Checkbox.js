@@ -1,15 +1,19 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import { CandidateContext } from '../Context';
 
 function ToggleSwitch(props) {
+    const {isJDCheck, setIsJDChecked} = useContext(CandidateContext);
     const {isToggled, setToggle,action} =props;
     // Handle the toggle switch
     const handleToggle = () => {
-       
+        if(props.value==="not_checked"){
+            setIsJDChecked(false)
+           }
         setToggle(!isToggled);
         if(props.setAction){
-            props.setAction(isToggled)
+            props.setAction(isToggled);
         }
+      
        
 };
     return (
