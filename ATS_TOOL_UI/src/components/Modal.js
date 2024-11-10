@@ -24,7 +24,7 @@ const style = {
 const url = process.env.REACT_APP_API_URL;
 
 export default function UploadModal(props) {
-    const { isOpen, closeModal, score, candidateId, isJDChecked } = props.value;
+    const { isOpen, closeModal, score, candidateId, isJDChecked, isMultipleResumeUpload } = props.value;
     const navigate = useNavigate();
     const [isLoading, setIsLoading] = React.useState(false);
 
@@ -41,6 +41,9 @@ export default function UploadModal(props) {
         catch (e) {
             console.error(ALERTS.FAILED_TO_SWITCH, e)
         }
+    }
+    const  HandleBackToCandidatelist = ()=>{
+        navigate('/candidatelist');
     }
     return (
         <div>
@@ -64,7 +67,7 @@ export default function UploadModal(props) {
                     </IconButton>
                     {/*UPLOADED RESUME AND PROFILE CHECK*/}
                     {
-                        !isJDChecked ? (<div>
+                        !isJDChecked && !isMultipleResumeUpload ? (<div>
                             <Typography id="modal-modal-title" className="text-center font-bold" sx={{ mt: 2, text: 'bold' }} variant="h5" component="h1">
                                 Resume successfully uploaded
                             </Typography>
@@ -73,7 +76,15 @@ export default function UploadModal(props) {
                                 <Button variant="outlined" onClick={closeModal}>Back to Upload Profile</Button>
                             </Box>
                         </div>)
-                            : (<div>
+                            : isMultipleResumeUpload ?   (<div>
+                                <Typography id="modal-modal-title" className="text-center font-bold" sx={{ mt: 2, text: 'bold' }} variant="h5" component="h1">
+                                    Resume successfully uploaded
+                                </Typography>
+                                <Box display="flex" justifyContent="space-between" gap={4} mt={6}>
+                                    <Button variant="contained" onClick={HandleBackToCandidatelist}>Check Candidates</Button>
+                                    <Button variant="outlined" onClick={closeModal}>Back to Upload Profile</Button>
+                                </Box>
+                            </div>) : (<div>
                                 {/*CHECK ONLY APPLICANT PROFILE'S SCORE */}
                                 <Typography id="modal-modal-title" className="text-center font-bold" sx={{ mt: 2, text: 'bold' }} variant="h5" component="h1">
                                     Profile successfully analysed and Applicant's score is

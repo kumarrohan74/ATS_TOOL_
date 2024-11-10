@@ -36,38 +36,42 @@ app.get(END_POINTS.GET_CANDIDATES, async (req, res) => {
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
 
-app.post(END_POINTS.RESUME_UPLOAD, upload.single("resume"), async (req, res) => {
-    const resumeBuffer = req.file.buffer;
-    const resumeName = req.file.originalname;
+app.post(END_POINTS.RESUME_UPLOAD, upload.array("resume"), async (req, res) => {
     const jobDescription = req.body.jobDescription ? req.body.jobDescription : null;
     const applied_position = req.body.applied_position;
-    const application_status = req.body.application_status;
-
     try {
-        const resumeData = await pdfParse(resumeBuffer);
-        const resumeText = resumeData.text;
-        const newCandidate = new Candidate({
-            name: extractName(resumeText),
-            email: extractEmail(resumeText),
-            phone_number: extractPhone(resumeText),
-            ats_score: jobDescription === null ? 0 : compareText(resumeText, jobDescription),
-            location: extractLocation(resumeText),
-            skills: extractSkills(resumeText),
-            experience: extractExperience(resumeText),
-            currentOrganisation: extractCurrentOrganization(resumeText),
-            candidateDescription: extractCandidateDescription(resumeText),
-            applied_position,
-            status: application_status,
-            resume: { resumeName, resumeBuffer, resumeText },
-            remarks: "no remarks yet"
-        })
-        if (jobDescription !== null) {
-            res.status(201).json({ atsScore: newCandidate.ats_score, message: 'ATS score successfully generated' })
+
+        const data_list = [];
+        for (let file of req.files) {
+            const resumeBuffer = file.buffer;
+            const resumeName = file.originalname;
+            const resumeData = await pdfParse(resumeBuffer);
+            const resumeText = resumeData.text;
+            const newCandidate = new Candidate({
+                name: extractName(resumeText),
+                email: extractEmail(resumeText),
+                phone_number: extractPhone(resumeText),
+                ats_score: jobDescription === null ? 0 : compareText(resumeText, jobDescription),
+                location: extractLocation(resumeText),
+                skills: extractSkills(resumeText),
+                experience: extractExperience(resumeText),
+                currentOrganisation: extractCurrentOrganization(resumeText),
+                candidateDescription: extractCandidateDescription(resumeText),
+                applied_position,
+                resume: { resumeName, resumeBuffer, resumeText },
+                remarks: "NO Remarks Added"
+            })
+            data_list.push(newCandidate);
         }
-        else {
-            const savedCandidate = await newCandidate.save();
+
+        if (jobDescription !== null && req.files.length === 1) {
+            res.status(201).json({ atsScore: data_list[0].ats_score, message: 'ATS score successfully generated' })
+        } else {
+            const savedCandidate = await Candidate.insertMany(data_list);
             res.status(201).json(savedCandidate);
         }
+
+
     } catch (error) {
         res.status(STATUS_CODES.SERVER_ERROR).send(serverConsts.error_parsing_resume);
     }
@@ -122,7 +126,6 @@ app.get(END_POINTS.CANDIDATE_ID, async (req, res) => {
 
 app.get(END_POINTS.DOWNLOAD_RESUME, async (req, res) => {
     const { id } = req.params;
-
     try {
         const candidate = await Candidate.findById(id);
         if (!candidate || !candidate.resume) {

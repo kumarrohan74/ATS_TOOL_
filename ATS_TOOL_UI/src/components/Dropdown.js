@@ -9,7 +9,7 @@ export default function Dropdown(props) {
   const { isJDChecked, applied_position, setApplied_position, positions, application_status, setApplication_status, applicant_status } = React.useContext(CandidateContext);
   const { dropdown } = props;
   const dropdownFor = dropdown === "addProfile" ? positions : applicant_status;
-  const [options, setOptions] = React.useState(dropdownFor)
+  const [options, setOptions] = React.useState(dropdownFor);
   const handleChange = (event) => {
     if (dropdown === "addProfile") {
       setApplied_position(event.target.value);
@@ -21,6 +21,7 @@ export default function Dropdown(props) {
     }
   };
   return (
+   
     <FormControl sx={{ minWidth: 200 }} size="small" className="mr-2" required={(dropdown === "addProfile" && !isJDChecked) ? true : false}>
       <InputLabel id="demo-select-small-label">{dropdown === "addProfile" ? "Role" : "Status"}</InputLabel>
       <Select
@@ -34,5 +35,7 @@ export default function Dropdown(props) {
         {options.map((option, i) => <MenuItem value={option} key={i + 1}>{option}</MenuItem>)}
       </Select>
     </FormControl>
+   
+   
   );
 }
