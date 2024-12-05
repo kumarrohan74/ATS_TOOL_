@@ -1,10 +1,12 @@
 import React, { useEffect, useState } from "react";
 import axios from "axios";
+import JSZip from "jszip";
+import { saveAs } from "file-saver";
 import { Button, TextField } from "@mui/material";
 import PersonSearchIcon from '@mui/icons-material/PersonSearch';
 import Backdrop from '@mui/material/Backdrop';
 import CircularProgress from '@mui/material/CircularProgress';
-import Snackbar, { SnackbarCloseReason } from '@mui/material/Snackbar';
+import Snackbar from '@mui/material/Snackbar';
 import Alert from '@mui/material/Alert';
 import { useNavigate } from 'react-router-dom';
 import UploadModal from "./Modal";
@@ -103,7 +105,7 @@ function ATSMatch() {
             if (!data[0]?.length) {
                 console.log('also here')
                 handleSnackbarClick();
-              }
+            }
             const rows = data[0].map((details) => {
                 return {
                     id: details?._id, name: details?.name, email: details?.email, ats_score: Math.round(details?.ats_score), applied_position: details?.applied_position,
@@ -113,7 +115,7 @@ function ATSMatch() {
             setFilteredRows(rows);
             setLoader(false)
         }
-       
+
     }, [data]);
 
     const handleCloseLoader = () => {
@@ -146,6 +148,31 @@ function ATSMatch() {
         { field: 'ats_score', headerName: 'ATS Score', width: 90 }
     ];
 
+    const downloadAllResumes = async () => {
+        const zip = new JSZip();
+        const folder = zip.folder("resumes");
+
+        try {
+            const downloadPromises = filteredRows.map(async (candidate) => {
+                const response = await fetch(`${API_URI}/download/${candidate.id}`);
+                if (!response.ok) {
+                    throw new Error(`Failed to download resume for ${candidate.name}`);
+                }
+                const blob = await response.blob();
+                const fileName = candidate?.resume?.resumeName || `${candidate.name}_resume.pdf`;
+                folder.file(fileName, blob); // Add file to ZIP folder
+            });
+
+            await Promise.all(downloadPromises);
+
+            const zipBlob = await zip.generateAsync({ type: "blob" });
+            saveAs(zipBlob, "resumes.zip"); // Save the ZIP file
+            console.log("All resumes downloaded successfully.");
+        } catch (error) {
+            console.error("Error downloading resumes:", error);
+        }
+    };
+
     return (
         <>
             {isOpen && <UploadModal value={{ isOpen, closeModal, score, candidateId, isJDChecked }} />}
@@ -163,7 +190,7 @@ function ATSMatch() {
                     variant="filled"
                     sx={{ width: '100%' }}
                 >
-                   No Candidates found
+                    No Candidates found
                 </Alert>
             </Snackbar>
             <form onSubmit={handleSubmit} className="w-5/6">
@@ -209,14 +236,35 @@ function ATSMatch() {
                     </div>
                 </div>
                 {data[0]?.length ? (
-                    <div>
+                    <div className="w-full">
                         <p className="text-2xl py-2 mx-10 font-bold">Matched Candidates</p>
                         <div className="w-11/12 mx-10 shadow-lg p-8 shadow-md">
-                            <DataTable columns={updatedColumns} rows={filteredRows} loader={loader} />
+                            <div className="flex justify-between items-center mb-4">
+                                <div>
+                                    <Button
+                                        variant="contained"
+                                        color="primary"
+                                        onClick={downloadAllResumes}
+                                        style={{ marginTop: '20px' }}
+                                        sx={{
+                                            backgroundColor: '#4f46e5',
+                                            color: 'white',
+                                            '&:hover': {
+                                                backgroundColor: '#3730a3',
+                                            },
+                                        }}
+                                    >
+                                        Download All Resumes
+                                    </Button>
+                                </div>
+                            </div>
+                            <div className="w-full">
+                                <DataTable columns={updatedColumns} rows={filteredRows} loader={loader} />
+                            </div>
                         </div>
                     </div>
                 ) : (
-                   null
+                    null
                 )}
             </form>
         </>)
