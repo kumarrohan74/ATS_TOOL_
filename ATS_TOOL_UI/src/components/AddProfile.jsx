@@ -18,6 +18,8 @@ function AddProfile() {
   const [score, setScore] = useState(0);
   const [candidateId, setCandidateId] = useState('');
   const [openLoader, setOpenLoader] = React.useState(false);
+  const [uploadMessageText, setUploadMessageText] = useState('');
+  const [isReset, setIsReset] = useState(false);
   const { isJDChecked, applied_position, setIsJDChecked, setIsMultipleResumeUpload, isMultipleResumeUpload } = React.useContext(CandidateContext);
 
   const handleCloseLoader = () => {
@@ -25,6 +27,12 @@ function AddProfile() {
   };
   const handleResumeChange = (e) => {
     const folder = Array.from(e.target.files);
+    if(folder.length === 1) {
+      setUploadMessageText(folder[0].name)
+    }
+    else {
+      setUploadMessageText("Multiple resumes uploaded");
+    }
     setResume(folder);
   }
 
@@ -60,6 +68,7 @@ function AddProfile() {
 
       setOpenLoader(false);
       setIsOpen(true);
+      setIsReset(true)
     } catch (error) {
       console.error(ALERTS.ERROR_UPLOAD, error);
     }
@@ -119,7 +128,7 @@ function AddProfile() {
               htmlFor="fileUpload"
               className="border-2 border-dashed border-gray-400 p-6 w-11/12 text-center font-medium rounded-lg cursor-pointer bg-zinc-50 hover:bg-zinc-200 transition duration-300 block text-lg font-medium text-gray-700"
             >
-              {!resume ? "Upload Resume" : resume.name}
+              {!resume ? "Upload Resume" : uploadMessageText}
             </label>
           </div>
           <div className="w-11/12 flex justify-between items-center ml-10 mt-4">
@@ -131,7 +140,7 @@ function AddProfile() {
             {/* Dropdown and Upload Button on the right */}
             <div className="flex items-center">
               <div className="mr-4">
-                <Dropdown dropdown="addProfile" disabled={isJDChecked} />
+                <Dropdown dropdown="addProfile" isReset={isReset} disabled={isJDChecked} />
               </div>
               <Button
                 type="submit"

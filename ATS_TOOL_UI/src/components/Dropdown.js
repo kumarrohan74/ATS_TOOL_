@@ -1,4 +1,5 @@
 import * as React from 'react';
+import {useEffect} from 'react';
 import InputLabel from '@mui/material/InputLabel';
 import MenuItem from '@mui/material/MenuItem';
 import FormControl from '@mui/material/FormControl';
@@ -7,9 +8,17 @@ import { CandidateContext } from './Context';
 
 export default function Dropdown(props) {
   const { isJDChecked, applied_position, setApplied_position, positions, application_status, setApplication_status, applicant_status } = React.useContext(CandidateContext);
-  const { dropdown } = props;
+  const { dropdown, isReset } = props;
   const dropdownFor = dropdown === "addProfile" ? positions : applicant_status;
   const [options, setOptions] = React.useState(dropdownFor);
+
+
+  useEffect(() => {
+    if(isReset) {
+      setApplied_position('')
+    }
+  },[isReset])
+
   const handleChange = (event) => {
     if (dropdown === "addProfile") {
       setApplied_position(event.target.value);

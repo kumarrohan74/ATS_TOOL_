@@ -16,7 +16,7 @@ const Sidebar = () => {
     else {
       setActivePath(location.pathname)
     }
-  }, [])
+  },[location.pathname])
 
   const handleClick = (e) => {
     if (e.target.id === 'candidatelist') {

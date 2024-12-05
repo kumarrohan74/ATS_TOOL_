@@ -144,18 +144,24 @@ export default function CandidateProfile() {
             <p className="text-gray-500 text-base">Exp: {candidate?.experience.totalYears}+ years</p>
 
           </div>
-          <div className="ml-14">
-            {  /*<ATSScoreCard score={candidate?.ats_score} />*/}
-          </div>
           <div className="ml-auto">
-            <p className="text-gray-600 text-lg"><strong><MailIcon /></strong> {candidate?.email}</p>
-            <p className="text-gray-600 text-lg"><strong><LocalPhoneIcon /></strong> {candidate?.phone_number}</p>
-            <p className="text-gray-600 text-lg"><strong><LocationOnIcon /></strong> {candidate?.location}</p>
-            <p className="text-gray-600 text-lg"><strong><PictureAsPdfIcon /><a className="text-blue-600 text-underline" href={`data:application/pdf;base64,${resume?.resumeBuffer}`} download={resume?.resumeName} onClick={downloadFile} />
-              {resume?.resumeName}</strong>
-            </p>
+            <div className='flex gap-4'>
+              <div className="text-gray-600 text-lg w-auto"><strong><MailIcon /></strong> </div><div>{candidate?.email}</div>
+            </div>
+            <div className='flex gap-4'>
+              <div className="text-gray-600 text-lg w-auto"><strong><LocalPhoneIcon /></strong> </div><div>{candidate?.phone_number}</div>
+            </div>
+            <div className='flex gap-4'>
+              <div className="text-gray-600 text-lg w-auto"><strong><LocationOnIcon /></strong> </div><div>{candidate?.location}</div>
+            </div>
+            <div className='flex gap-4'>
+              <div className="text-gray-600 text-lg"><strong><PictureAsPdfIcon /></strong></div>
+              <div className='cursor-pointer'><p className="text-blue-600 text-underline" onClick={downloadFile}>
+                <strong>{resume?.resumeName}</strong>
+              </p> </div>
+              </div>
+            </div>
           </div>
-        </div>
       </div>
       <div className="flex flex-wrap">
         <div className="w-1/3 px-2">
@@ -241,7 +247,7 @@ export default function CandidateProfile() {
                   <div className='flex justify-end mt-2 space-x-2'> <Button variant="contained" type="submit" className='bg-blue-500 text-white font-bold  rounded'>Save</Button>
                     <Button variant="text" className='mb-4 font-bold text-red-800 rounded border hover:bg-gray-300 ml-2' onClick={handleCancelRemarks}>Cancel</Button>
                   </div> </form>
-                : <p class="mr-4 text-md text-gray-500 font-bold">
+                : <p className="mr-4 text-md text-gray-500 font-bold">
                   {formValue} <span className="cursor-pointer text-blue-600 text-sm ml-2 underline" onClick={() => setIsEditRemarksOpen(true)}>edit remarks</span>
                 </p>
             }
