@@ -62,7 +62,6 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.array("resume"), async (req, res) => {
                 remarks: "NO Remarks Added"
             })
             data_list.push(newCandidate);
-            console.log(newCandidate)
         }
 
         if (jobDescription !== null && req.files.length === 1) {

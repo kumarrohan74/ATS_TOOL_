@@ -17,7 +17,9 @@ function Candidatelist() {
     const [openLoader, setOpenLoader] = useState(false);
 
     const columns = [
-        { field: 'id', headerName: 'ID', width: 90 },
+        { field: 'serial', headerName: 'S.No.', width: 90,
+            renderCell: (params) => params.api.getAllRowIds().indexOf(params.id)+1
+         },
         {
             field: 'name',
             headerName: 'Full Name',
@@ -88,9 +90,9 @@ function Candidatelist() {
     };
 
     if (candidates) {
-        rows = candidates.map((details) => {
+        rows = candidates.map((details,index) => {
             return {
-                id: details?._id, name: details?.name, email: details?.email, applied_position: details?.applied_position,
+                id: details?._id , name: details?.name, email: details?.email, applied_position: details?.applied_position,
                 status: details?.status, experience: details?.experience?.totalYears, location: details?.location,
             }
         })

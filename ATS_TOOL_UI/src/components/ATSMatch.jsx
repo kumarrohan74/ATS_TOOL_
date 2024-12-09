@@ -46,7 +46,10 @@ function ATSMatch() {
     const endpoint = END_POINTS.GET_CANDIDATES_BY_SCORE;
 
     const columns = [
-        { field: 'id', headerName: 'ID', width: 90 },
+       
+        { field: 'serial', headerName: 'S.No.', width: 90,
+            renderCell: (params) => params.api.getAllRowIds().indexOf(params.id)+1
+         },
         {
             field: 'name',
             headerName: 'Full Name',

@@ -1,6 +1,7 @@
 import * as React from 'react';
 import { Box, TextField } from '@mui/material';
-import { DataGrid } from '@mui/x-data-grid';
+import { DataGrid, GridToolbarContainer, GridToolbarExport } from '@mui/x-data-grid';
+import {useDemoData} from '@mui/x-data-grid-generator'
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { API_URI, END_POINTS, ALERTS } from './Constants';
@@ -35,9 +36,28 @@ function DataTable(props) {
             })
             .catch((err) => console.error(err))
     }
+    const { data, loading } = useDemoData({
+        dataSet: 'Candidates',
+        rowLength: filteredRows,
+        maxColumns: columns,
+      });
+      function CustomToolbar() {
+        return (
+          <GridToolbarContainer>
+             <Box sx={{ flexGrow: 1, marginBottom: '5%'}} />
+           <GridToolbarExport
+        slotProps={{
+          tooltip: { title: 'Export data' },
+          button: { variant: 'outlined' },
+        }}
+        printOptions={false}
+      />
+          </GridToolbarContainer>
+        );
+      }
     return (
         <>
-            <Box className="w-11/12 mb-4">
+            <Box className="w-11/12 mb-4" sx={{ width:'98%' }}>
                 <TextField
                     variant="outlined"
                     label="Search candidates details"
@@ -46,7 +66,7 @@ function DataTable(props) {
                     onChange={handleSearch}
                 />
             </Box>
-            <Box className="w-11/12" sx={{ minHeight: '20%', height: 'auto' }}>
+            <Box  sx={{ minHeight: '20%', height: 'auto',width:'98%' }}>
                 <DataGrid
                     rows={filteredRows}
                     columns={columns}
@@ -60,6 +80,7 @@ function DataTable(props) {
                     pageSizeOptions={[10]}
                     loading={loader}
                     className='cursor-pointer'
+                    slots={{toolbar: CustomToolbar }}
                 />
             </Box>
         </>

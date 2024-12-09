@@ -138,6 +138,7 @@ export default function CandidateProfile() {
           </div>
           <div className="ml-6">
             <h2 className="font-bold text-2xl">{candidate?.name}</h2>
+            <p className="text-gray-700 text-sm"><span  className="text-gray-700 text-lg">Candidate ID: </span>{candidate?._id}</p>
             <p className="text-gray-700 text-lg">{candidate?.category}</p>
             <p className="text-gray-500 text-base">ABC Company Pvt.Ltd.</p>
             <p className="text-gray-500 text-base">{candidate?.education}</p>
