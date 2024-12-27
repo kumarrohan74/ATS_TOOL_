@@ -139,9 +139,9 @@ export default function CandidateProfile() {
           <div className="ml-6">
             <h2 className="font-bold text-2xl">{candidate?.name}</h2>
             <p className="text-gray-700 text-lg">{candidate?.category}</p>
-            <p className="text-gray-500 text-base">ABC Company Pvt.Ltd.</p>
+            <p className="text-gray-500 text-base">{candidate?.currentOrganisation}</p>
             <p className="text-gray-500 text-base">{candidate?.education}</p>
-            <p className="text-gray-500 text-base">Exp: {candidate?.experience.totalYears}+ years</p>
+            <p className="text-gray-500 text-base">Exp: {candidate?.experience}+ years</p>
 
           </div>
           <div className="ml-auto">
@@ -235,7 +235,7 @@ export default function CandidateProfile() {
           <div className="bg-white rounded-lg shadow-lg p-6 min-h-[300px]">
             <h3 className="text-2xl font-bold mb-4 text-indigo-800">Candidate's Description</h3>
             <p className="text-lg text-gray-700">
-              {candidate?.candidateDescription}
+              {candidate?.profileSummary}
             </p>
           </div>
           <div className="bg-white rounded-lg shadow-lg mt-2 p-6 h-auto">

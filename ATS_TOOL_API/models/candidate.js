@@ -10,14 +10,13 @@ const candidateSchema = new mongoose.Schema({
         resumeText: { type: String, required: true },
     },
     ats_score: { type: Number, default: 0 },
-    skills: { type: [String] },
-    experience: {
-        totalYears: { type: Number, required: true },
-        totalMonths: { type: Number, required: true },
-        totalExperienceInMonths: { type: Number }
-    },
+    skills: { type: mongoose.Schema.Types.Mixed },
     education: { type: String },
+    experience: { type: Number },
     applied_position: { type: String },
+    currentOrganisation: { type: String },
+    currentPosition: { type: String },
+    profileSummary: { type: String },
     date_applied: { type: Date, default: Date.now },
     location: { type: String },
     status: {

@@ -11,6 +11,7 @@ const DATABASE_LISTS = {
     ATS_MASTER_DATA: "ATS_master_data",
     CANDIDATES_DB: 'candidates_list_updated',
 };
+const ANALYSE_RESUME_URL = 'http://tracker.aminobots.in/analyze_resume';
 const END_POINTS = {
     GET_CANDIDATES: "/get-candidates",
     RESUME_UPLOAD: "/resume-upload",
@@ -33,4 +34,4 @@ const serverConsts = {
 const messages = {
     data_added: ' Data added'
 };
-module.exports = { STATUS_CODES, mongoDBConsts, serverConsts, DATABASE_LISTS, messages, END_POINTS };
+module.exports = { STATUS_CODES, mongoDBConsts, serverConsts, DATABASE_LISTS, messages, END_POINTS, ANALYSE_RESUME_URL };

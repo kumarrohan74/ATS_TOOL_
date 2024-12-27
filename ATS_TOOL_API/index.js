@@ -1,14 +1,13 @@
 const express = require('express');
 const cors = require('cors');
+const axios = require('axios');
 const bodyParser = require('body-parser');
 const multer = require("multer");
 const pdfParse = require("pdf-parse");
 require('dotenv').config();
 const { connectDB } = require('./db');
 const Candidate = require('./models/candidate');
-const { compareText, extractCurrentOrganization, extractEmail, extractExperience, extractLocation,
-    extractName, extractPhone, extractSkills, extractCandidateDescription } = require("./utils/textMatch");
-const { serverConsts, STATUS_CODES, mongoDBConsts, messages, END_POINTS, DATABASE_LISTS } = require('./Constants')
+const { serverConsts, STATUS_CODES, mongoDBConsts, messages, END_POINTS, DATABASE_LISTS, ANALYSE_RESUME_URL } = require('./Constants')
 
 const app = express();
 
@@ -39,30 +38,45 @@ const upload = multer({ storage });
 app.post(END_POINTS.RESUME_UPLOAD, upload.array("resume"), async (req, res) => {
     const jobDescription = req.body.jobDescription ? req.body.jobDescription : null;
     const applied_position = req.body.applied_position;
-    try {
 
+    try {
         const data_list = [];
         for (let file of req.files) {
             const resumeBuffer = file.buffer;
-            const resumeName = file.originalname;
-            const resumeData = await pdfParse(resumeBuffer);
-            const resumeText = resumeData.text;
+            const resumeBase64 = resumeBuffer.toString('base64');
+
+            const analyzeResponse = await analyseresume(resumeBase64, jobDescription);
+
+            let skills = [];
+            if (Array.isArray(analyzeResponse.data.skills)) {
+                skills = analyzeResponse.data.skills.flat(Infinity); 
+            } else if (typeof analyzeResponse.data.skills === 'object' && analyzeResponse.data.skills !== null) {
+                skills = Object.values(analyzeResponse.data.skills).flat(Infinity);
+            } else {
+                skills = [];
+            }
+
+            const parsedResume = await pdfParse(resumeBuffer);
+            const resumeText = parsedResume.text;
+
             const newCandidate = new Candidate({
-                name: extractName(resumeText),
-                email: extractEmail(resumeText),
-                phone_number: extractPhone(resumeText),
-                ats_score: jobDescription === null ? 0 : compareText(resumeText, jobDescription),
-                location: extractLocation(resumeText),
-                skills: extractSkills(resumeText),
-                experience: extractExperience(resumeText),
-                currentOrganisation: extractCurrentOrganization(resumeText),
-                candidateDescription: extractCandidateDescription(resumeText),
+                name: analyzeResponse.data.personal_details.name,
+                email: analyzeResponse.data.personal_details.email,
+                phone_number: analyzeResponse.data.personal_details.phone,
+                ats_score: jobDescription === null ? 0 : analyzeResponse.data.ats_score,
+                profileSummary: analyzeResponse.data.profile_summary,
+                location: analyzeResponse.data.personal_details.location,
+                skills,
+                experience: analyzeResponse.data.total_experience,
+                currentOrganisation: analyzeResponse.data.work_experience[0]?.company,
+                currentPosition: analyzeResponse.data.work_experience[0]?.position,
+                candidateDescription: analyzeResponse.data.profile_summary,
                 applied_position,
-                resume: { resumeName, resumeBuffer, resumeText },
+                resume: { resumeName: file.originalname, resumeBuffer, resumeText },
                 remarks: "NO Remarks Added"
-            })
+            });
+
             data_list.push(newCandidate);
-            console.log(newCandidate)
         }
 
         if (jobDescription !== null && req.files.length === 1) {
@@ -71,12 +85,12 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.array("resume"), async (req, res) => {
             const savedCandidate = await Candidate.insertMany(data_list);
             res.status(201).json(savedCandidate);
         }
-
-
     } catch (error) {
-        res.status(STATUS_CODES.SERVER_ERROR).send(serverConsts.error_parsing_resume);
+        console.error("Error occurred:", error);
+        return res.status(500).json({ error: "Error parsing resume or saving data" });
     }
 });
+
 
 app.get(END_POINTS.CANDIDATE_ID, async (req, res) => {
     const candidate = await fetchCandidates(req.params.id);
@@ -151,16 +165,32 @@ app.post(END_POINTS.GET_CANDIDATES_BY_SCORE, async (req, res) => {
 });
 
 
-const generateScoreByResume = (resumeText, jobDescription) => {
-    let atsScore = compareText(resumeText, jobDescription)
+const generateScoreByResume = async(candidateBase64, jobDescription) => {
+    const analyzeResponse = await analyseresume(candidateBase64, jobDescription);
+    let atsScore = analyzeResponse.data.ats_score;
     return atsScore;
+}
+
+const analyseresume = async(file, jobDescription) => {
+    try {
+        var analyze_Response = await axios.post(
+            `${ANALYSE_RESUME_URL}`,
+            { file, job_description: jobDescription },
+            { headers: { 'Content-Type': 'application/json' } }
+        );
+    } catch (err) {
+        console.error("Error calling analyze_resume API:", err.response?.data || err.message);
+        return res.status(500).json({ error: "Failed to analyze resume. Please try again later." });
+    }
+    return analyze_Response;
 }
 
 async function fetchCandidatesByScore(jobDescription, atsScore) {
     try {
         const candidates = await Candidate.find({});
         const candidatePromises = candidates.map(async (candidate) => {
-            const atsGeneratedScore = generateScoreByResume(candidate.resume.resumeText, jobDescription);
+            const candidateBase64 = candidate.resume.resumeBuffer.toString('base64');
+            const atsGeneratedScore = await generateScoreByResume(candidateBase64, jobDescription);
 
             if (atsGeneratedScore >= atsScore) {
                 candidate.ats_score = atsGeneratedScore;
