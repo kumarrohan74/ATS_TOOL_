@@ -3,7 +3,7 @@ const mongoose = require('mongoose');
 const candidateSchema = new mongoose.Schema({
     name: { type: String, required: true },
     email: { type: String, required: true },
-    phone_number: { type: String, required: true },
+    phone_number: { type: String },
     resume: {
         resumeName: { type: String, required: true },
         resumeBuffer: { type: Buffer, required: true },
