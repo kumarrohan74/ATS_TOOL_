@@ -180,7 +180,6 @@ const analyseresume = async(file, jobDescription) => {
         );
     } catch (err) {
         console.error("Error calling analyze_resume API:", err.response?.data || err.message);
-        return res.status(500).json({ error: "Failed to analyze resume. Please try again later." });
     }
     return analyze_Response;
 }
