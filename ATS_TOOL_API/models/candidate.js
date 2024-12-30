@@ -1,13 +1,13 @@
 const mongoose = require('mongoose');
 
 const candidateSchema = new mongoose.Schema({
-    name: { type: String, required: true },
-    email: { type: String, required: true },
+    name: { type: String},
+    email: { type: String },
     phone_number: { type: String },
     resume: {
-        resumeName: { type: String, required: true },
-        resumeBuffer: { type: Buffer, required: true },
-        resumeText: { type: String, required: true },
+        resumeName: { type: String },
+        resumeBuffer: { type: Buffer },
+        resumeText: { type: String },
     },
     ats_score: { type: Number, default: 0 },
     skills: { type: mongoose.Schema.Types.Mixed },

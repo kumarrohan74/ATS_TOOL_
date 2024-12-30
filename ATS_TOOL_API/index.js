@@ -46,6 +46,7 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.array("resume"), async (req, res) => {
             const resumeBase64 = resumeBuffer.toString('base64');
 
             const analyzeResponse = await analyseresume(resumeBase64, jobDescription);
+            console.log(analyzeResponse)
 
             let skills = [];
             if (Array.isArray(analyzeResponse?.data.skills)) {
