@@ -48,7 +48,7 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.array("resume"), async (req, res) => {
             const analyzeResponse = await analyseresume(resumeBase64, jobDescription);
 
             let skills = [];
-            if (Array.isArray(analyzeResponse.data.skills)) {
+            if (Array.isArray(analyzeResponse?.data.skills)) {
                 skills = analyzeResponse.data.skills.flat(Infinity); 
             } else if (typeof analyzeResponse.data.skills === 'object' && analyzeResponse.data.skills !== null) {
                 skills = Object.values(analyzeResponse.data.skills).flat(Infinity);
