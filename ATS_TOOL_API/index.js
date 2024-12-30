@@ -50,7 +50,7 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.array("resume"), async (req, res) => {
             let skills = [];
             if (Array.isArray(analyzeResponse?.data.skills)) {
                 skills = analyzeResponse.data.skills.flat(Infinity); 
-            } else if (typeof analyzeResponse.data.skills === 'object' && analyzeResponse.data.skills !== null) {
+            } else if (typeof analyzeResponse?.data.skills === 'object' && analyzeResponse?.data.skills !== null) {
                 skills = Object.values(analyzeResponse.data.skills).flat(Infinity);
             } else {
                 skills = [];
