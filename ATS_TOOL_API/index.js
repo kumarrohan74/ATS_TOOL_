@@ -60,17 +60,17 @@ app.post(END_POINTS.RESUME_UPLOAD, upload.array("resume"), async (req, res) => {
             const resumeText = parsedResume.text;
 
             const newCandidate = new Candidate({
-                name: analyzeResponse.data.personal_details?.name,
-                email: analyzeResponse.data.personal_details?.email,
-                phone_number: analyzeResponse.data.personal_details?.phone,
-                ats_score: jobDescription === null ? 0 : analyzeResponse.data.ats_score,
-                profileSummary: analyzeResponse.data.profile_summary,
-                location: analyzeResponse.data.personal_details.location,
+                name: analyzeResponse.data?.personal_details?.name,
+                email: analyzeResponse.data?.personal_details?.email,
+                phone_number: analyzeResponse.data?.personal_details?.phone,
+                ats_score: jobDescription === null ? 0 : analyzeResponse.data?.ats_score,
+                profileSummary: analyzeResponse.data?.profile_summary,
+                location: analyzeResponse.data?.personal_details.location,
                 skills,
-                experience: analyzeResponse.data.total_experience,
-                currentOrganisation: analyzeResponse.data.work_experience[0]?.company,
-                currentPosition: analyzeResponse.data.work_experience[0]?.position,
-                candidateDescription: analyzeResponse.data.profile_summary,
+                experience: analyzeResponse.data?.total_experience,
+                currentOrganisation: analyzeResponse.data?.work_experience[0]?.company,
+                currentPosition: analyzeResponse.data?.work_experience[0]?.position,
+                candidateDescription: analyzeResponse.data?.profile_summary,
                 applied_position,
                 resume: { resumeName: file.originalname, resumeBuffer, resumeText },
                 remarks: "NO Remarks Added"
