@@ -11,7 +11,7 @@ const DATABASE_LISTS = {
     ATS_MASTER_DATA: "ATS_master_data",
     CANDIDATES_DB: 'candidates_list_updated',
 };
-const ANALYSE_RESUME_URL = 'http://tracker.aminobots.in/analyze_resume';
+const ANALYSE_RESUME_URL = 'https://dev.aminobots.com/analyze_resume';
 const END_POINTS = {
     GET_CANDIDATES: "/get-candidates",
     RESUME_UPLOAD: "/resume-upload",
