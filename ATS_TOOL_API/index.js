@@ -16,11 +16,19 @@ connectDB();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
+const allowedOrigins = ['https://ats.aminobots.com', 'https://dev.aminobots.com'];
+
 app.use(cors({
-    origin: ['https://ats.aminobots.com', 'https://dev.aminobots.com'],
+    origin: (origin, callback) => {
+        if (allowedOrigins.includes(origin) || !origin) {  
+            callback(null, true);
+        } else {
+            callback(new Error('Not allowed by CORS')); 
+        }
+    },
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true
+    credentials: true  
 }));
 
 app.get('/api-health', async (req, res) => {
