@@ -16,13 +16,12 @@ connectDB();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use(function (req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', 'https://ats.aminobots.com');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type', 'Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', true);
-    next();
-});
+app.use(cors({
+    origin: ['https://ats.aminobots.com', 'https://dev.aminobots.com'],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true
+}));
 
 app.get('/api-health', async (req, res) => {
     res.json({ health: 'ok' });
