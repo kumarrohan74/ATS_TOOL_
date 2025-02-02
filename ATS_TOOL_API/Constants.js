@@ -12,6 +12,7 @@ const DATABASE_LISTS = {
     CANDIDATES_DB: 'candidates_list_updated',
 };
 const ANALYSE_RESUME_URL = 'https://dev.aminobots.com/analyze_resume';
+const GET_ATS_SCORE_URL = 'https://dev.aminobots.com/analyze_ats_score';
 const END_POINTS = {
     GET_CANDIDATES: "/get-candidates",
     RESUME_UPLOAD: "/resume-upload",
@@ -34,4 +35,4 @@ const serverConsts = {
 const messages = {
     data_added: ' Data added'
 };
-module.exports = { STATUS_CODES, mongoDBConsts, serverConsts, DATABASE_LISTS, messages, END_POINTS, ANALYSE_RESUME_URL };
+module.exports = { STATUS_CODES, mongoDBConsts, serverConsts, DATABASE_LISTS, messages, END_POINTS, ANALYSE_RESUME_URL, GET_ATS_SCORE_URL };

@@ -7,7 +7,7 @@ const pdfParse = require("pdf-parse");
 require('dotenv').config();
 const { connectDB } = require('./db');
 const Candidate = require('./models/candidate');
-const { serverConsts, STATUS_CODES, mongoDBConsts, messages, END_POINTS, DATABASE_LISTS, ANALYSE_RESUME_URL } = require('./Constants')
+const { serverConsts, STATUS_CODES, mongoDBConsts, messages, END_POINTS, DATABASE_LISTS, ANALYSE_RESUME_URL, GET_ATS_SCORE_URL } = require('./Constants')
 
 const app = express();
 
@@ -16,24 +16,28 @@ connectDB();
 app.use(cors());
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-const allowedOrigins = ['https://ats.aminobots.com', 'https://dev.aminobots.com'];
+const allowedOrigins = ['https://ats.aminobots.com', 'https://dev.aminobots.com', 'http://localhost:3000'];
 
 app.use(cors({
     origin: (origin, callback) => {
-        if (allowedOrigins.includes(origin) || !origin) {  
-            callback(null, true);
-        } else {
-            callback(new Error('Not allowed by CORS')); 
-        }
+      console.log('Incoming origin:', origin); // Log the origin
+      if (!origin) return callback(null, true);
+      if (allowedOrigins.indexOf(origin) !== -1) {
+        callback(null, true);
+      } else {
+        console.error('Blocked by CORS:', origin); // Log blocked origins
+        callback(new Error('Not allowed by CORS'));
+      }
     },
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true  
-}));
+  }));
+  
 
 app.get('/api-health', async (req, res) => {
     res.json({ health: 'ok' });
 });
+
+app.options('*', cors()); // Allow preflight for all routes
+
 
 app.get(END_POINTS.GET_CANDIDATES, async (req, res) => {
     const candidates = await fetchCandidates("true");
@@ -174,9 +178,23 @@ app.post(END_POINTS.GET_CANDIDATES_BY_SCORE, async (req, res) => {
 
 
 const generateScoreByResume = async(candidateBase64, jobDescription) => {
-    const analyzeResponse = await analyseresume(candidateBase64, jobDescription);
+    const analyzeResponse = await getATSScore(candidateBase64, jobDescription);
     let atsScore = analyzeResponse.data.ats_score;
     return atsScore;
+}
+
+const getATSScore = async(file, jobDescription) => {
+    try {
+        var analyze_Response = await axios.post(
+            `${GET_ATS_SCORE_URL}`,
+            { file, job_description: jobDescription },
+            { headers: { 'Content-Type': 'application/json' },
+            withCredentials: true }
+        );
+    } catch (err) {
+        console.error("Error calling analyze_resume API:", err.response?.data || err.message);
+    }
+    return analyze_Response;
 }
 
 const analyseresume = async(file, jobDescription) => {
@@ -184,7 +202,8 @@ const analyseresume = async(file, jobDescription) => {
         var analyze_Response = await axios.post(
             `${ANALYSE_RESUME_URL}`,
             { file, job_description: jobDescription },
-            { headers: { 'Content-Type': 'application/json' } }
+            { headers: { 'Content-Type': 'application/json' },
+            withCredentials: true }
         );
     } catch (err) {
         console.error("Error calling analyze_resume API:", err.response?.data || err.message);
