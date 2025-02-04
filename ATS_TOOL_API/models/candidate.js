@@ -43,6 +43,6 @@ const candidateSchema = new mongoose.Schema({
     remarks: { type: String, required: false }
 });
 
-const Candidate = mongoose.model('Candidate', candidateSchema, 'candidates_list_updated');
+const Candidate = mongoose.model('Candidate', candidateSchema, 'candidates_list_updated1');
 
 module.exports = Candidate;

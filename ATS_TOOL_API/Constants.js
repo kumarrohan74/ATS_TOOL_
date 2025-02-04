@@ -9,7 +9,7 @@ const STATUS_CODES = {
 };
 const DATABASE_LISTS = {
     ATS_MASTER_DATA: "ATS_master_data",
-    CANDIDATES_DB: 'candidates_list_updated',
+    CANDIDATES_DB: 'candidates_list_updated1',
 };
 const ANALYSE_RESUME_URL = 'https://dev.aminobots.com/analyze_resume';
 const GET_ATS_SCORE_URL = 'https://dev.aminobots.com/analyze_ats_score';

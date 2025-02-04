@@ -13,7 +13,7 @@ const app = express();
 
 connectDB();
 
-app.use(cors());
+
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 const allowedOrigins = ['https://ats.aminobots.com', 'https://dev.aminobots.com', 'http://localhost:3000'];
@@ -178,7 +178,7 @@ app.post(END_POINTS.GET_CANDIDATES_BY_SCORE, async (req, res) => {
 
 
 const generateScoreByResume = async(candidateBase64, jobDescription) => {
-    const analyzeResponse = await getATSScore(candidateBase64, jobDescription);
+    const analyzeResponse = await analyseresume(candidateBase64, jobDescription);
     let atsScore = analyzeResponse.data.ats_score;
     return atsScore;
 }
