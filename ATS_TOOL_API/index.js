@@ -16,28 +16,14 @@ connectDB();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-const allowedOrigins = ['https://ats.aminobots.com', 'https://dev.aminobots.com', 'http://localhost:3000', 'https://tracker.aminobots.com'];
 
 app.use(cors({
-    origin: (origin, callback) => {
-      console.log('Incoming origin:', origin); // Log the origin
-      if (!origin) return callback(null, true);
-      if (allowedOrigins.indexOf(origin) !== -1) {
-        callback(null, true);
-      } else {
-        console.error('Blocked by CORS:', origin); // Log blocked origins
-        callback(new Error('Not allowed by CORS'));
-      }
-    },
-  }));
-  
+  origin: '*',  // This will allow requests from any origin
+}));
 
 app.get('/api-health', async (req, res) => {
     res.json({ health: 'ok' });
 });
-
-app.options('*', cors()); // Allow preflight for all routes
-
 
 app.get(END_POINTS.GET_CANDIDATES, async (req, res) => {
     const candidates = await fetchCandidates("true");
