@@ -162,10 +162,10 @@ app.get(END_POINTS.DOWNLOAD_RESUME, async (req, res) => {
 });
 
 app.post(END_POINTS.GET_CANDIDATES_BY_SCORE, async (req, res) => {
-    // const selectedCandidates = [];
-    // const response = []
-    // selectedCandidates.push(response)
-    res.json({ response: [] })
+    const selectedCandidates = [];
+    const response = await fetchCandidatesByScore(req.body.jobDescription, req.body.score)
+    selectedCandidates.push(response)
+    res.json({ response: selectedCandidates })
 });
 
 
