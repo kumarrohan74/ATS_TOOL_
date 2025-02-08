@@ -16,7 +16,7 @@ connectDB();
 
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-const allowedOrigins = ['https://ats.aminobots.com', 'https://dev.aminobots.com', 'http://localhost:3000'];
+const allowedOrigins = ['https://ats.aminobots.com', 'https://dev.aminobots.com', 'http://localhost:3000', 'https://tracker.aminobots.com'];
 
 app.use(cors({
     origin: (origin, callback) => {
