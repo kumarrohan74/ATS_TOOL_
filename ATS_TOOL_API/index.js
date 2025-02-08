@@ -17,9 +17,15 @@ connectDB();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// Ensure cors middleware is used globally
 app.use(cors({
-  origin: '*',  // This will allow requests from any origin
-}));
+    origin: '*',  // This will allow requests from any origin
+    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  }));
+  
+  // Handle pre-flight OPTIONS request
+app.options('*', cors()); //
 
 app.get('/api-health', async (req, res) => {
     res.json({ health: 'ok' });
