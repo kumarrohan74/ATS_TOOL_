@@ -17,15 +17,32 @@ connectDB();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
+// app.use((req, res, next) => {
+//     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
+//     next();
+//   });
+
 // Ensure cors middleware is used globally
 app.use(cors({
-    origin: '*',  // This will allow requests from any origin
-    methods: ['GET', 'POST', 'PUT', 'DELETE'],
+    origin: [
+        'https://ats.aminobots.com', // Frontend
+        'https://tracker.aminobots.com', // Backend
+        'https://dev.aminobots.com', // AI/ML service
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
-  }));
-  
-  // Handle pre-flight OPTIONS request
-app.options('*', cors()); //
+    credentials: true, // Allow cookies and credentials
+}));
+
+app.options('*', cors());
+
+app.use((req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', req.headers.origin || '*');
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    next();
+});
 
 app.get('/api-health', async (req, res) => {
     res.json({ health: 'ok' });
