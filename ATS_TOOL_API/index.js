@@ -156,6 +156,9 @@ app.get(END_POINTS.DOWNLOAD_RESUME, async (req, res) => {
 });
 
 app.post(END_POINTS.GET_CANDIDATES_BY_SCORE, async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*'); // Allow all origins
+    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE'); // Allowed methods
+    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
     const selectedCandidates = [];
     const response = await fetchCandidatesByScore(req.body.jobDescription, req.body.score)
     selectedCandidates.push(response)
