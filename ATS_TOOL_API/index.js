@@ -23,17 +23,34 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //   });
 
 // Ensure cors middleware is used globally
-app.use(cors({
-    origin: [
-        'https://ats.aminobots.com', // Frontend
-        'https://tracker.aminobots.com', // Backend
-        'https://dev.aminobots.com', // AI/ML service
-        'http://localhost:3000'
-    ],
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-    credentials: true, // Allow cookies and credentials
-}));
+// app.use(cors({
+//     origin: [
+//         'https://ats.aminobots.com', // Frontend
+//         'https://tracker.aminobots.com', // Backend
+//         'https://dev.aminobots.com', // AI/ML service
+//         'http://localhost:3000'
+//     ],
+//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+//     allowedHeaders: ['Content-Type', 'Authorization'],
+//     credentials: true, // Allow cookies and credentials
+// }));
+
+const corsOptions = {
+    origin: (origin, callback) => {
+        if (!origin) {
+            // Allow requests with no origin (e.g., Postman, server-side calls)
+            return callback(null, true);
+        }
+        if (['https://ats.aminobots.com'].includes(origin)) {
+            return callback(null, true);
+        } else {
+            return callback(new Error('Not allowed by CORS'));
+        }
+    },
+    credentials: true,
+};
+
+app.use(cors(corsOptions));
 
 app.options('*', cors());
 
