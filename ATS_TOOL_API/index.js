@@ -28,6 +28,7 @@ app.use(cors({
         'https://ats.aminobots.com', // Frontend
         'https://tracker.aminobots.com', // Backend
         'https://dev.aminobots.com', // AI/ML service
+        'http://localhost:3000'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -36,11 +37,17 @@ app.use(cors({
 
 app.options('*', cors());
 
+// app.use((req, res, next) => {
+//     res.setHeader('Access-Control-Allow-Origin', 'https://ats.aminobots.com');
+//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
+//     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+//     res.setHeader('Access-Control-Allow-Credentials', 'true');
+//     next();
+// });
+
 app.use((req, res, next) => {
-    res.setHeader('Access-Control-Allow-Origin', 'https://ats.aminobots.com');
-    res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-    res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    console.log('Request Origin:', req.headers.origin);
+    console.log('Request Method:', req.method);
     next();
 });
 
