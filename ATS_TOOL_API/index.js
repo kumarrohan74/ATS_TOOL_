@@ -37,8 +37,9 @@ app.use(bodyParser.urlencoded({ extended: true }));
 
 const corsOptions = {
     origin: (origin, callback) => {
-        if (!origin) {
+        if (!origin || origin === undefined) {
             // Allow requests with no origin (e.g., Postman, server-side calls)
+            console.log('origin undefined')
             return callback(null, true);
         }
         if (['https://ats.aminobots.com'].includes(origin)) {
