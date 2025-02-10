@@ -196,8 +196,8 @@ app.post(END_POINTS.GET_CANDIDATES_BY_SCORE, async (req, res) => {
 
 app.post('/getCandidateByScore', async (req, res) => {
     const selectedCandidates = [];
-    // const response = await fetchCandidatesByScore(req.body.jobDescription, req.body.score)
-    // selectedCandidates.push(response)
+    const response = await fetchCandidatesByScore(req.body.jobDescription, req.body.score)
+    selectedCandidates.push(response)
     res.json({ response: [] })
 });
 
