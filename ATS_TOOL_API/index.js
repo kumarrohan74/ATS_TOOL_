@@ -17,18 +17,12 @@ connectDB();
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 
-// app.use((req, res, next) => {
-//     res.setHeader('Cross-Origin-Opener-Policy', 'same-origin-allow-popups');
-//     next();
-//   });
-
 // Ensure cors middleware is used globally
 app.use(cors({
     origin: [
         'https://ats.aminobots.com', // Frontend
         'https://tracker.aminobots.com', // Backend
-        'https://dev.aminobots.com', // AI/ML service
-        'http://localhost:3000'
+        'https://dev.aminobots.com', //AI/ML
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -36,20 +30,6 @@ app.use(cors({
 }));
 
 app.options('*', cors());
-
-// app.use((req, res, next) => {
-//     res.setHeader('Access-Control-Allow-Origin', 'https://ats.aminobots.com');
-//     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-//     res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-//     res.setHeader('Access-Control-Allow-Credentials', 'true');
-//     next();
-// });
-
-app.use((req, res, next) => {
-    console.log('Request Origin:', req.headers.origin);
-    console.log('Request Method:', req.method);
-    next();
-});
 
 app.get('/api-health', async (req, res) => {
     res.json({ health: 'ok' });
@@ -61,6 +41,8 @@ app.get(END_POINTS.GET_CANDIDATES, async (req, res) => {
 });
 const storage = multer.memoryStorage();
 const upload = multer({ storage });
+
+
 
 app.post(END_POINTS.RESUME_UPLOAD, upload.array("resume"), async (req, res) => {
     const jobDescription = req.body.jobDescription ? req.body.jobDescription : null;
@@ -125,8 +107,6 @@ app.get(END_POINTS.CANDIDATE_ID, async (req, res) => {
     res.status(STATUS_CODES.SUCCESS).json(candidate);
 });
 
-
-
 app.patch(`${END_POINTS.CANDIDATE_ID}`, async (req, res) => {
     const { id } = req.body;
     const key = req.query.key;
@@ -187,15 +167,19 @@ app.get(END_POINTS.DOWNLOAD_RESUME, async (req, res) => {
     }
 });
 
-app.post(END_POINTS.GET_CANDIDATES_BY_SCORE, async (req, res) => {
+app.post(END_POINTS.GET_CANDIDATES_BY_SCORE, upload.single('file'), async (req, res) => {
     const selectedCandidates = [];
+    const uploadedFile = req.file;
+    console.log(uploadedFile)
     const response = await fetchCandidatesByScore(req.body.jobDescription, req.body.score)
     selectedCandidates.push(response)
     res.json({ response: selectedCandidates })
 });
 
+
 const generateScoreByResume = async(candidateBase64, jobDescription) => {
     const analyzeResponse = await analyseresume(candidateBase64, jobDescription);
+    //console.log("analyzeResponse",analyzeResponse)
     let atsScore = analyzeResponse.data.ats_score;
     return atsScore;
 }
@@ -205,7 +189,7 @@ const getATSScore = async(file, jobDescription) => {
         var analyze_Response = await axios.post(
             `${GET_ATS_SCORE_URL}`,
             { file, job_description: jobDescription },
-            { headers: { 'Content-Type': 'application/json' },
+            { headers: { 'Content-Type': 'multipart/form-data' },
             withCredentials: true }
         );
     } catch (err) {
@@ -231,11 +215,12 @@ const analyseresume = async(file, jobDescription) => {
 async function fetchCandidatesByScore(jobDescription, atsScore) {
     try {
         const candidates = await Candidate.find({});
-        console.log("candidates",candidates)
+        //console.log("candidates",candidates)
         const candidatePromises = candidates.map(async (candidate) => {
             const candidateBase64 = candidate.resume.resumeBuffer.toString('base64');
             const atsGeneratedScore = await generateScoreByResume(candidateBase64, jobDescription);
-
+            console.log("atsGeneratedScore",atsGeneratedScore)
+            console.log("atsScore",atsScore)
             if (atsGeneratedScore >= atsScore) {
                 candidate.ats_score = atsGeneratedScore;
                 await candidate.save();

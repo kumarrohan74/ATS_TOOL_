@@ -128,8 +128,11 @@ function ATSMatch() {
         const payload = {
             jobDescription, score
         }
+        const formData = new FormData();
+        formData.append("jobDescription", jobDescription);
+        formData.append("score", score);
         try {
-            const response = await axios.post(`${apiURI}${endpoint}`, payload, {
+            const response = await axios.post(`${apiURI}${endpoint}`, formData, {
                 headers: {
                     'Content-Type': 'multipart/form-data',
                 },
