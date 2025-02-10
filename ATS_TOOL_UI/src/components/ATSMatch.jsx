@@ -43,7 +43,7 @@ function ATSMatch() {
     };
     const { isJDChecked } = React.useContext(CandidateContext);
     const apiURI = process.env.REACT_APP_API_URL;
-    const endpoint = '/getCandidateByScore';
+    const endpoint = '/getCandidatesByScore';
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 90 },
