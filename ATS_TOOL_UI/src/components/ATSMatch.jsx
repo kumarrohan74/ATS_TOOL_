@@ -43,7 +43,7 @@ function ATSMatch() {
     };
     const { isJDChecked } = React.useContext(CandidateContext);
     const apiURI = process.env.REACT_APP_API_URL;
-    const endpoint = END_POINTS.GET_CANDIDATES_BY_SCORE;
+    const endpoint = '/getCandidateByScore';
 
     const columns = [
         { field: 'id', headerName: 'ID', width: 90 },
@@ -131,7 +131,7 @@ function ATSMatch() {
         try {
             const response = await axios.post(`${apiURI}${endpoint}`, payload, {
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'multipart/form-data',
                 },
                 withCredentials: true
             });

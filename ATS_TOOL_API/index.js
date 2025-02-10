@@ -23,35 +23,17 @@ app.use(bodyParser.urlencoded({ extended: true }));
 //   });
 
 // Ensure cors middleware is used globally
-// app.use(cors({
-//     origin: [
-//         'https://ats.aminobots.com', // Frontend
-//         'https://tracker.aminobots.com', // Backend
-//         'https://dev.aminobots.com', // AI/ML service
-//         'http://localhost:3000'
-//     ],
-//     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-//     allowedHeaders: ['Content-Type', 'Authorization'],
-//     credentials: true, // Allow cookies and credentials
-// }));
-
-const corsOptions = {
-    origin: (origin, callback) => {
-        if (!origin || origin === undefined) {
-            // Allow requests with no origin (e.g., Postman, server-side calls)
-            console.log('origin undefined')
-            return callback(null, true);
-        }
-        if (['https://ats.aminobots.com'].includes(origin)) {
-            return callback(null, true);
-        } else {
-            return callback(new Error('Not allowed by CORS'));
-        }
-    },
-    credentials: true,
-};
-
-app.use(cors(corsOptions));
+app.use(cors({
+    origin: [
+        'https://ats.aminobots.com', // Frontend
+        'https://tracker.aminobots.com', // Backend
+        'https://dev.aminobots.com', // AI/ML service
+        'http://localhost:3000'
+    ],
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+    credentials: true, // Allow cookies and credentials
+}));
 
 app.options('*', cors());
 
@@ -143,6 +125,8 @@ app.get(END_POINTS.CANDIDATE_ID, async (req, res) => {
     res.status(STATUS_CODES.SUCCESS).json(candidate);
 });
 
+
+
 app.patch(`${END_POINTS.CANDIDATE_ID}`, async (req, res) => {
     const { id } = req.body;
     const key = req.query.key;
@@ -204,6 +188,13 @@ app.get(END_POINTS.DOWNLOAD_RESUME, async (req, res) => {
 });
 
 app.post(END_POINTS.GET_CANDIDATES_BY_SCORE, async (req, res) => {
+    const selectedCandidates = [];
+    // const response = await fetchCandidatesByScore(req.body.jobDescription, req.body.score)
+    // selectedCandidates.push(response)
+    res.json({ response: [] })
+});
+
+app.post('/getCandidateByScore', async (req, res) => {
     const selectedCandidates = [];
     // const response = await fetchCandidatesByScore(req.body.jobDescription, req.body.score)
     // selectedCandidates.push(response)
