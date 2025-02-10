@@ -125,22 +125,35 @@ function ATSMatch() {
     const handleSubmit = async (e) => {
         setOpenLoader(true);
         e.preventDefault();
+    
         const payload = {
-            jobDescription, score
-        }
+            jobDescription,
+            score,
+        };
+    
         try {
-            const response = await axios.post(`${apiURI}${endpoint}`, payload, {
+            const response = await fetch(`${apiURI}${endpoint}`, {
+                method: 'POST',
                 headers: {
                     'Content-Type': 'application/json',
                 },
-                withCredentials: true
+                credentials: 'include', // Equivalent to `withCredentials: true` in Axios
+                body: JSON.stringify(payload),
             });
-            setData(response.data.response)
-            setOpenLoader(false);
+    
+            if (!response.ok) {
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+    
+            const responseData = await response.json();
+            setData(responseData.response);
         } catch (error) {
             console.error("Error uploading files:", error);
+        } finally {
+            setOpenLoader(false);
         }
     };
+    
 
     const closeModal = () => setIsOpen(false)
 
