@@ -23,6 +23,7 @@ app.use(cors({
         'https://ats.aminobots.com', // Frontend
         'https://tracker.aminobots.com', // Backend
         'https://dev.aminobots.com', //AI/ML
+        'http://localhost:3000'
     ],
     methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
     allowedHeaders: ['Content-Type', 'Authorization'],
@@ -178,8 +179,7 @@ app.post(END_POINTS.GET_CANDIDATES_BY_SCORE, upload.single('file'), async (req, 
 
 
 const generateScoreByResume = async(candidateBase64, jobDescription) => {
-    const analyzeResponse = await analyseresume(candidateBase64, jobDescription);
-    //console.log("analyzeResponse",analyzeResponse)
+    const analyzeResponse = await getATSScore(candidateBase64, jobDescription);
     let atsScore = analyzeResponse.data.ats_score;
     return atsScore;
 }
@@ -189,7 +189,7 @@ const getATSScore = async(file, jobDescription) => {
         var analyze_Response = await axios.post(
             `${GET_ATS_SCORE_URL}`,
             { file, job_description: jobDescription },
-            { headers: { 'Content-Type': 'multipart/form-data' },
+            { headers: { 'Content-Type': 'application/json' },
             withCredentials: true }
         );
     } catch (err) {
